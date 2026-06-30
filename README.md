@@ -11,6 +11,7 @@ RMPD (Rejestracja Międzynarodowych Przewozów Drogowych) — обязатель
 | Документ | Описание |
 |----------|----------|
 | [docs/product-specification.md](docs/product-specification.md) | Спецификация организации продукта (стек, модули, API, этапы) |
+| [docs/implementation-plan.md](docs/implementation-plan.md) | План реализации по спринтам и критериям приёмки |
 | [docs/puesc-api.md](docs/puesc-api.md) | Интеграция с API PUESC через канал SEAP (SOAP/WebService) |
 | [docs/rmpd100.md](docs/rmpd100.md) | Бизнес-логика и структура формы RMPD100 |
 | [docs/architecture.md](docs/architecture.md) | Архитектура компонентов и потоков данных |

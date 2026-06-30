@@ -537,6 +537,8 @@ storage:
 
 ## 11. Этапы разработки
 
+> Детальный план по спринтам, задачам и критериям приёмки: [implementation-plan.md](implementation-plan.md)
+
 ### Фаза 1 — MVP (8–10 недель)
 
 - [ ] Scaffold: Angular + Spring Boot + MySQL + Docker
