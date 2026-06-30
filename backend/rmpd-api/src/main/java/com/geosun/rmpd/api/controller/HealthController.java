@@ -1,6 +1,5 @@
 package com.geosun.rmpd.api.controller;
 
-import com.geosun.rmpd.api.dto.ApiStubResponse;
 import com.geosun.rmpd.api.dto.HealthResponse;
 import com.geosun.rmpd.application.service.HealthService;
 import com.geosun.rmpd.infrastructure.xml.XsdValidator;

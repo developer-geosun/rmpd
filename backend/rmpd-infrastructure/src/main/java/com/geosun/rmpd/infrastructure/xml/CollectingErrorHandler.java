@@ -1,6 +1,5 @@
 package com.geosun.rmpd.infrastructure.xml;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXParseException;

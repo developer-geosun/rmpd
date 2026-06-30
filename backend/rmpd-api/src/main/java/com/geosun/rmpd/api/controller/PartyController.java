@@ -3,7 +3,6 @@ package com.geosun.rmpd.api.controller;
 import com.geosun.rmpd.application.dto.PartyDto;
 import com.geosun.rmpd.application.dto.PartyUpsertDto;
 import com.geosun.rmpd.application.service.PartyService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
