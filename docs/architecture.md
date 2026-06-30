@@ -8,23 +8,23 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        Frontend (Angular + Material)             │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌────────────────────┐  │
-│  │ Форма    │ │ Список   │ │ Детали   │ │ Статус отправки    │  │
-│  │ RMPD100  │ │ деклараций│ │ декларации│ │ (polling/progress) │  │
-│  └──────────┘ └──────────┘ └──────────┘ └────────────────────┘  │
+│                        Frontend (Angular + Material)            │
+│  ┌──────────┐ ┌───────────┐ ┌───────────┐ ┌────────────────────┐│
+│  │ Форма    │ │ Список    │ │ Детали    │ │ Статус отправки    ││
+│  │ RMPD100  │ │ деклараций│ │ декларации│ │ (polling/progress) ││
+│  └──────────┘ └───────────┘ └───────────┘ └────────────────────┘│
 └────────────────────────────┬────────────────────────────────────┘
                              │ REST API
 ┌────────────────────────────▼────────────────────────────────────┐
-│                        Backend API                               │
-│  ┌─────────────┐ ┌──────────────┐ ┌─────────────────────────┐  │
-│  │ Declaration │ │ XML Generator│ │ PUESC Client (SEAP SOAP) │  │
-│  │ Service     │ │ + XSD Valid. │ │ AcceptDocument / Get*   │  │
-│  └─────────────┘ └──────────────┘ └─────────────────────────┘  │
-│  ┌─────────────┐ ┌──────────────┐ ┌─────────────────────────┐  │
-│  │ Dictionary  │ │ Signature    │ │ Job Queue (polling)     │  │
-│  │ Sync        │ │ Service      │ │                         │  │
-│  └─────────────┘ └──────────────┘ └─────────────────────────┘  │
+│                        Backend API                              │
+│  ┌─────────────┐ ┌──────────────┐ ┌─────────────────────────┐   │
+│  │ Declaration │ │ XML Generator│ │ PUESC Client (SEAP SOAP)│   │
+│  │ Service     │ │ + XSD Valid. │ │ AcceptDocument / Get*   │   │
+│  └─────────────┘ └──────────────┘ └─────────────────────────┘   │
+│  ┌─────────────┐ ┌──────────────┐ ┌─────────────────────────┐   │
+│  │ Dictionary  │ │ Signature    │ │ Job Queue (polling)     │   │
+│  │ Sync        │ │ Service      │ │                         │   │
+│  └─────────────┘ └──────────────┘ └─────────────────────────┘   │
 └────────────────────────────┬────────────────────────────────────┘
                              │
               ┌──────────────┼──────────────┐
@@ -165,18 +165,21 @@ PuescCredential  — учётные данные PUESC (зашифровано)
 
 ---
 
-## 7. Технологический стек (рекомендация)
+## 7. Технологический стек
 
 | Слой | Технология |
 |------|------------|
 | Frontend | Angular 19+, Angular Material |
-| Backend | .NET 8 / Node.js (на выбор команды) |
-| SOAP | generated client из WS_PULL.wsdl |
-| XML/XSD | libxml2 / System.Xml.Schema |
-| Подпись | DSS (Digital Signature Service) / custom XAdES |
-| DB | PostgreSQL |
-| Queue | Hangfire / BullMQ |
+| Backend | Java 21, Spring Boot 3.x |
+| SOAP | JAX-WS / Spring WS client из WS_PULL.wsdl |
+| XML/XSD | JAXB + javax.xml.validation (XSD) |
+| Подпись | EU DSS (Digital Signature Service) / XAdES-BES |
+| DB | MySQL 8.x |
+| Queue | Spring `@Scheduled` / Spring Batch |
+| OCR CMR | Tesseract / cloud OCR (см. product-specification.md) |
 | Deploy | Docker, env: TEST / PROD PUESC |
+
+> Полная спецификация организации продукта: [product-specification.md](product-specification.md)
 
 ---
 
