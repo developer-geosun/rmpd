@@ -10,6 +10,19 @@ export type DeclarationStatus =
 
 export type TransportType = 'LADEN' | 'EMPTY' | 'TRANSIT' | 'CABOTAGE';
 
+export type RoutePointType = 'ENTRY' | 'EXIT';
+
+export interface RoutePoint {
+  type: RoutePointType;
+  name: string;
+  country: string;
+}
+
+export interface DeclarationProgress {
+  completionPercent: number;
+  missingFields: string[];
+}
+
 export interface Declaration {
   id: number;
   status: DeclarationStatus;
@@ -27,6 +40,8 @@ export interface Declaration {
   puescSysRef?: string;
   referenceNumber?: string;
   comment?: string;
+  termsAccepted?: boolean;
+  completionPercent?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -44,6 +59,7 @@ export interface DeclarationUpsert {
   receiverPartyId?: number;
   routePointsJson?: string;
   comment?: string;
+  termsAccepted?: boolean;
 }
 
 export interface DeclarationEvent {

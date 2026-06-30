@@ -2,12 +2,14 @@ package com.geosun.rmpd.api.controller;
 
 import com.geosun.rmpd.application.dto.DeclarationDto;
 import com.geosun.rmpd.application.dto.DeclarationEventDto;
+import com.geosun.rmpd.application.dto.DeclarationProgressDto;
 import com.geosun.rmpd.application.dto.DeclarationUpsertDto;
 import com.geosun.rmpd.application.dto.SubmitResultDto;
 import com.geosun.rmpd.application.dto.ValidationResultDto;
 import com.geosun.rmpd.application.service.DeclarationService;
 import com.geosun.rmpd.application.service.DeclarationSubmitService;
 import com.geosun.rmpd.application.service.PuescPollingService;
+import com.geosun.rmpd.domain.enums.DeclarationStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -44,8 +47,8 @@ public class DeclarationController {
 
     @GetMapping
     @Operation(summary = "Список декларацій")
-    public ResponseEntity<List<DeclarationDto>> list() {
-        return ResponseEntity.ok(declarationService.list());
+    public ResponseEntity<List<DeclarationDto>> list(@RequestParam(required = false) DeclarationStatus status) {
+        return ResponseEntity.ok(declarationService.list(status));
     }
 
     @PostMapping
@@ -59,6 +62,12 @@ public class DeclarationController {
     @Operation(summary = "Деталі декларації")
     public ResponseEntity<DeclarationDto> get(@PathVariable Long id) {
         return ResponseEntity.ok(declarationService.get(id));
+    }
+
+    @GetMapping("/{id}/progress")
+    @Operation(summary = "Прогрес заповнення декларації")
+    public ResponseEntity<DeclarationProgressDto> progress(@PathVariable Long id) {
+        return ResponseEntity.ok(declarationService.progress(id));
     }
 
     @PutMapping("/{id}")

@@ -2,15 +2,28 @@ import { DatePipe } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { DeclarationsApiService } from '../../core/services/declarations-api.service';
-import { Declaration } from '../../core/models/declaration.models';
+import { Declaration, DeclarationStatus } from '../../core/models/declaration.models';
 
 @Component({
   selector: 'app-declarations-list',
-  imports: [DatePipe, MatTableModule, MatButtonModule, MatIconModule, MatSnackBarModule, RouterLink],
+  imports: [
+    DatePipe,
+    MatTableModule,
+    MatButtonModule,
+    MatIconModule,
+    MatSnackBarModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatProgressBarModule,
+    RouterLink,
+  ],
   templateUrl: './declarations-list.component.html',
 })
 export class DeclarationsListComponent implements OnInit {
@@ -19,14 +32,31 @@ export class DeclarationsListComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
 
   readonly items = signal<Declaration[]>([]);
-  readonly displayedColumns = ['id', 'status', 'cmrNumber', 'referenceNumber', 'updatedAt', 'actions'];
+  readonly statusFilter = signal<DeclarationStatus | ''>('');
+  readonly displayedColumns = ['id', 'status', 'progress', 'cmrNumber', 'referenceNumber', 'updatedAt', 'actions'];
+
+  readonly statusOptions: { value: DeclarationStatus | ''; label: string }[] = [
+    { value: '', label: 'Усі' },
+    { value: 'DRAFT', label: 'Чернетка' },
+    { value: 'VALIDATED', label: 'Перевірено' },
+    { value: 'SUBMITTED', label: 'Відправлено' },
+    { value: 'REGISTERED', label: 'Зареєстровано' },
+    { value: 'REJECTED', label: 'Відхилено' },
+    { value: 'ERROR', label: 'Помилка' },
+  ];
 
   ngOnInit(): void {
     this.reload();
   }
 
+  onFilterChange(value: DeclarationStatus | ''): void {
+    this.statusFilter.set(value);
+    this.reload();
+  }
+
   reload(): void {
-    this.api.list().subscribe({
+    const status = this.statusFilter();
+    this.api.list(status || undefined).subscribe({
       next: (data) => this.items.set(data),
       error: () => this.snackBar.open('Помилка завантаження', 'Закрити', { duration: 4000 }),
     });

@@ -1,10 +1,11 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import {
   CmrDocument,
   Declaration,
   DeclarationEvent,
+  DeclarationProgress,
   DeclarationUpsert,
   DictionaryEntry,
   PuescConnectionTest,
@@ -18,8 +19,12 @@ import {
 export class DeclarationsApiService {
   private readonly http = inject(HttpClient);
 
-  list(): Observable<Declaration[]> {
-    return this.http.get<Declaration[]>('/api/v1/declarations');
+  list(status?: string): Observable<Declaration[]> {
+    let params = new HttpParams();
+    if (status) {
+      params = params.set('status', status);
+    }
+    return this.http.get<Declaration[]>('/api/v1/declarations', { params });
   }
 
   create(): Observable<Declaration> {
@@ -28,6 +33,10 @@ export class DeclarationsApiService {
 
   get(id: number): Observable<Declaration> {
     return this.http.get<Declaration>(`/api/v1/declarations/${id}`);
+  }
+
+  progress(id: number): Observable<DeclarationProgress> {
+    return this.http.get<DeclarationProgress>(`/api/v1/declarations/${id}/progress`);
   }
 
   update(id: number, data: DeclarationUpsert): Observable<Declaration> {

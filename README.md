@@ -6,7 +6,9 @@
 
 RMPD (Rejestracja Międzynarodowych Przewozów Drogowych) — обязательная регистрация международных автомобильных перевозок и каботажа на территории Польши для иностранных перевозчиков (ст. 28b закона о дорожном транспорте).
 
-## Быстрый старт (фаза 0)
+## Быстрый старт
+
+Подробная инструкция: **[docs/getting-started.md](docs/getting-started.md)**
 
 ### Требования
 
@@ -60,6 +62,7 @@ rmpd/
 
 | Документ | Описание |
 |----------|----------|
+| [docs/getting-started.md](docs/getting-started.md) | Запуск проекта (локально и Docker) |
 | [docs/product-specification.md](docs/product-specification.md) | Спецификация организации продукта (стек, модули, API, этапы) |
 | [docs/implementation-plan.md](docs/implementation-plan.md) | План реализации по спринтам и критериям приёмки |
 | [docs/puesc-api.md](docs/puesc-api.md) | Интеграция с API PUESC через канал SEAP (SOAP/WebService) |

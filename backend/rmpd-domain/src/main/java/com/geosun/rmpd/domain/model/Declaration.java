@@ -17,6 +17,8 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.time.LocalDate;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "declaration")
@@ -73,6 +75,7 @@ public class Declaration {
     @JoinColumn(name = "receiver_party_id")
     private Party receiverParty;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "route_points_json", columnDefinition = "JSON")
     private String routePointsJson;
 
@@ -84,6 +87,9 @@ public class Declaration {
 
     @Column(name = "comment_text", columnDefinition = "TEXT")
     private String comment;
+
+    @Column(name = "terms_accepted", nullable = false)
+    private boolean termsAccepted;
 
     @Column(name = "xsd_version", nullable = false, length = 30)
     private String xsdVersion = "RMPD_v20.11.2024";
@@ -248,6 +254,14 @@ public class Declaration {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public boolean isTermsAccepted() {
+        return termsAccepted;
+    }
+
+    public void setTermsAccepted(boolean termsAccepted) {
+        this.termsAccepted = termsAccepted;
     }
 
     public String getXsdVersion() {

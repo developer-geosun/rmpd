@@ -1,14 +1,18 @@
 package com.geosun.rmpd.application.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.geosun.rmpd.application.dto.DeclarationDto;
 import com.geosun.rmpd.application.dto.DeclarationEventDto;
+import com.geosun.rmpd.application.dto.DeclarationProgressDto;
 import com.geosun.rmpd.application.dto.DeclarationUpsertDto;
+import com.geosun.rmpd.application.dto.RoutePointDto;
 import com.geosun.rmpd.application.dto.ValidationResultDto;
 import com.geosun.rmpd.application.exception.ResourceNotFoundException;
 import com.geosun.rmpd.application.validation.LatinInputValidator;
 import com.geosun.rmpd.domain.enums.DeclarationEventType;
 import com.geosun.rmpd.domain.enums.DeclarationStatus;
+import com.geosun.rmpd.domain.enums.TransportType;
 import com.geosun.rmpd.domain.model.Carrier;
 import com.geosun.rmpd.domain.model.Declaration;
 import com.geosun.rmpd.domain.model.DeclarationEvent;
@@ -45,6 +49,7 @@ public class DeclarationService {
     private final PartyRepository partyRepository;
     private final XsdValidator xsdValidator;
     private final ObjectMapper objectMapper;
+    private final DeclarationCompletionService completionService;
 
     public DeclarationService(
             DeclarationRepository declarationRepository,
@@ -55,7 +60,8 @@ public class DeclarationService {
             PermitRepository permitRepository,
             PartyRepository partyRepository,
             XsdValidator xsdValidator,
-            ObjectMapper objectMapper) {
+            ObjectMapper objectMapper,
+            DeclarationCompletionService completionService) {
         this.declarationRepository = declarationRepository;
         this.eventRepository = eventRepository;
         this.carrierRepository = carrierRepository;
@@ -65,18 +71,26 @@ public class DeclarationService {
         this.partyRepository = partyRepository;
         this.xsdValidator = xsdValidator;
         this.objectMapper = objectMapper;
+        this.completionService = completionService;
     }
 
     @Transactional(readOnly = true)
-    public List<DeclarationDto> list() {
-        return declarationRepository.findByCarrierIdOrderByUpdatedAtDesc(SecurityUtils.requireCarrierId()).stream()
-                .map(this::toDto)
-                .toList();
+    public List<DeclarationDto> list(DeclarationStatus status) {
+        Long carrierId = SecurityUtils.requireCarrierId();
+        List<Declaration> declarations = status == null
+                ? declarationRepository.findByCarrierIdOrderByUpdatedAtDesc(carrierId)
+                : declarationRepository.findByCarrierIdAndStatusOrderByUpdatedAtDesc(carrierId, status);
+        return declarations.stream().map(this::toDto).toList();
     }
 
     @Transactional(readOnly = true)
     public DeclarationDto get(Long id) {
         return toDto(requireDeclaration(id));
+    }
+
+    @Transactional(readOnly = true)
+    public DeclarationProgressDto progress(Long id) {
+        return completionService.evaluate(requireDeclaration(id));
     }
 
     @Transactional
@@ -125,6 +139,7 @@ public class DeclarationService {
         copy.setReceiverParty(source.getReceiverParty());
         copy.setRoutePointsJson(source.getRoutePointsJson());
         copy.setComment(source.getComment());
+        copy.setTermsAccepted(false);
         copy = declarationRepository.save(copy);
         addEvent(copy, DeclarationEventType.CREATED, "{\"copiedFrom\":" + id + "}");
         return toDto(copy);
@@ -187,7 +202,8 @@ public class DeclarationService {
         if (dto.comment() != null) {
             LatinInputValidator.requireLatin(dto.comment(), "comment");
         }
-        declaration.setTransportType(dto.transportType());
+        TransportType transportType = dto.transportType();
+        declaration.setTransportType(transportType);
         declaration.setCmrNumber(dto.cmrNumber());
         declaration.setRouteStartDate(dto.routeStartDate());
         declaration.setRouteEndDate(dto.routeEndDate());
@@ -195,27 +211,88 @@ public class DeclarationService {
         declaration.setUnloadingCountry(upper(dto.unloadingCountry()));
         declaration.setVehicle(resolveVehicle(dto.vehicleId()));
         declaration.setPermit(resolvePermit(dto.permitId()));
-        declaration.setSenderParty(resolveParty(dto.senderPartyId()));
-        declaration.setReceiverParty(resolveParty(dto.receiverPartyId()));
+        if (completionService.requiresParties(transportType)) {
+            declaration.setSenderParty(resolveParty(dto.senderPartyId()));
+            declaration.setReceiverParty(resolveParty(dto.receiverPartyId()));
+        } else {
+            declaration.setSenderParty(null);
+            declaration.setReceiverParty(null);
+        }
         declaration.setRoutePointsJson(dto.routePointsJson());
         declaration.setComment(dto.comment());
+        if (dto.termsAccepted() != null) {
+            declaration.setTermsAccepted(dto.termsAccepted());
+        }
     }
 
     private List<String> validateBusiness(Declaration d) {
         List<String> errors = new ArrayList<>();
+        Carrier carrier = d.getCarrier();
+        if (carrier.getIdType() == null || carrier.getIdType().isBlank()) {
+            errors.add("Профіль перевізника: не вказано тип ID");
+        }
+        if (carrier.getIdNumber() == null || carrier.getIdNumber().isBlank()) {
+            errors.add("Профіль перевізника: не вказано номер ID");
+        }
+        if (carrier.getName() == null || carrier.getName().isBlank()) {
+            errors.add("Профіль перевізника: не вказано назву");
+        }
+        if (carrier.getEmail() == null || carrier.getEmail().isBlank()) {
+            errors.add("Профіль перевізника: не вказано email");
+        }
+        if (d.getTransportType() == null) {
+            errors.add("Не обрано тип перевезення");
+        }
         if (d.getVehicle() == null) {
             errors.add("Не обрано транспортний засіб");
+        }
+        TransportType type = d.getTransportType();
+        if (type == TransportType.LADEN || type == TransportType.CABOTAGE) {
+            if (d.getPermit() == null) {
+                errors.add("Не обрано дозвіл");
+            }
+            if (d.getSenderParty() == null) {
+                errors.add("Не обрано відправника");
+            }
+            if (d.getReceiverParty() == null) {
+                errors.add("Не обрано отримувача");
+            }
         }
         if (d.getRouteStartDate() == null) {
             errors.add("Не вказано дату початку перевезення");
         }
+        if (d.getRouteEndDate() == null) {
+            errors.add("Не вказано дату завершення перевезення");
+        }
+        if (d.getRouteStartDate() != null
+                && d.getRouteEndDate() != null
+                && d.getRouteEndDate().isBefore(d.getRouteStartDate())) {
+            errors.add("Дата завершення не може бути раніше дати початку");
+        }
         if (d.getLoadingCountry() == null || d.getUnloadingCountry() == null) {
             errors.add("Не вказано країни завантаження/розвантаження");
+        }
+        if (parseRoutePoints(d.getRoutePointsJson()).isEmpty()) {
+            errors.add("Додайте хоча б одну точку маршруту в Польщі");
         }
         if (d.getCmrNumber() != null && !LatinInputValidator.isLatin(d.getCmrNumber())) {
             errors.add("Номер CMR має бути латиницею");
         }
+        if (!d.isTermsAccepted()) {
+            errors.add("Потрібно підтвердити заяви (Oświadczenia)");
+        }
         return errors;
+    }
+
+    private List<RoutePointDto> parseRoutePoints(String json) {
+        if (json == null || json.isBlank()) {
+            return List.of();
+        }
+        try {
+            return objectMapper.readValue(json, new TypeReference<List<RoutePointDto>>() {});
+        } catch (Exception ex) {
+            return List.of();
+        }
     }
 
     private Vehicle resolveVehicle(Long id) {
@@ -255,6 +332,7 @@ public class DeclarationService {
     }
 
     private DeclarationDto toDto(Declaration d) {
+        int completionPercent = completionService.evaluate(d).completionPercent();
         return new DeclarationDto(
                 d.getId(),
                 d.getStatus(),
@@ -272,6 +350,8 @@ public class DeclarationService {
                 d.getPuescSysRef(),
                 d.getReferenceNumber(),
                 d.getComment(),
+                d.isTermsAccepted(),
+                completionPercent,
                 d.getCreatedAt(),
                 d.getUpdatedAt());
     }

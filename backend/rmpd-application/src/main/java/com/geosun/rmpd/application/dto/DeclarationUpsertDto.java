@@ -16,4 +16,5 @@ public record DeclarationUpsertDto(
         Long senderPartyId,
         Long receiverPartyId,
         String routePointsJson,
-        String comment) {}
+        String comment,
+        Boolean termsAccepted) {}

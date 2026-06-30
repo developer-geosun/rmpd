@@ -1,0 +1,2 @@
+ALTER TABLE declaration
+    ADD COLUMN terms_accepted BOOLEAN NOT NULL DEFAULT FALSE;

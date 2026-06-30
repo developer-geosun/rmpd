@@ -1,9 +1,19 @@
 <div class="page-header">
   <h1>Декларації RMPD100</h1>
-  <button mat-flat-button color="primary" type="button" (click)="create()">
-    <mat-icon>add</mat-icon>
-    Нова декларація
-  </button>
+  <div class="header-actions">
+    <mat-form-field class="filter-field">
+      <mat-label>Статус</mat-label>
+      <mat-select [value]="statusFilter()" (selectionChange)="onFilterChange($event.value)">
+        @for (opt of statusOptions; track opt.value) {
+          <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <button mat-flat-button color="primary" type="button" (click)="create()">
+      <mat-icon>add</mat-icon>
+      Нова декларація
+    </button>
+  </div>
 </div>
 
 <table mat-table [dataSource]="items()" class="mat-elevation-z1 full-width">
@@ -15,6 +25,16 @@
   <ng-container matColumnDef="status">
     <th mat-header-cell *matHeaderCellDef>Статус</th>
     <td mat-cell *matCellDef="let row">{{ row.status }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="progress">
+    <th mat-header-cell *matHeaderCellDef>Заповнення</th>
+    <td mat-cell *matCellDef="let row">
+      <div class="progress-cell">
+        <mat-progress-bar mode="determinate" [value]="row.completionPercent ?? 0" />
+        <span>{{ row.completionPercent ?? 0 }}%</span>
+      </div>
+    </td>
   </ng-container>
 
   <ng-container matColumnDef="cmrNumber">
@@ -42,3 +62,35 @@
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 </table>
+
+<style>
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .filter-field {
+    min-width: 12rem;
+  }
+
+  .progress-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 8rem;
+
+    mat-progress-bar {
+      flex: 1;
+    }
+  }
+</style>

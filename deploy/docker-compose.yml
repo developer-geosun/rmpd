@@ -16,7 +16,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-      start_period: 30s
+      start_period: 45s
 
   backend:
     build:
@@ -32,18 +32,22 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-rmpd}
       RMPD_XSD_PATH: ${RMPD_XSD_PATH:-/app/specs/rmpd/RMPD_v20.11.2024}
       PUESC_ENV: ${PUESC_ENV:-test}
+      PUESC_CLIENT: ${PUESC_CLIENT:-mock}
       PUESC_WSDL_URL: ${PUESC_WSDL_URL:-https://te-ws.puesc.gov.pl/seap_wsChannel/DocumentHandlingPort?wsdl}
       PUESC_TARGET_SYSTEM: ${PUESC_TARGET_SYSTEM:-SENT}
+      RMPD_MAIL_ENABLED: ${RMPD_MAIL_ENABLED:-false}
+      MANAGEMENT_HEALTH_MAIL_ENABLED: "false"
     ports:
       - "8080:8080"
     volumes:
       - ../specs:/app/specs:ro
+    restart: on-failure
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/health"]
       interval: 15s
       timeout: 5s
       retries: 10
-      start_period: 60s
+      start_period: 90s
 
   frontend:
     build:

@@ -12,6 +12,9 @@ public interface DeclarationRepository extends JpaRepository<Declaration, Long> 
     @Query("SELECT d FROM Declaration d WHERE d.carrier.id = :carrierId ORDER BY d.updatedAt DESC")
     List<Declaration> findByCarrierIdOrderByUpdatedAtDesc(Long carrierId);
 
+    @Query("SELECT d FROM Declaration d WHERE d.carrier.id = :carrierId AND d.status = :status ORDER BY d.updatedAt DESC")
+    List<Declaration> findByCarrierIdAndStatusOrderByUpdatedAtDesc(Long carrierId, DeclarationStatus status);
+
     @Query("SELECT d FROM Declaration d WHERE d.id = :id AND d.carrier.id = :carrierId")
     Optional<Declaration> findByIdAndCarrierId(Long id, Long carrierId);
 

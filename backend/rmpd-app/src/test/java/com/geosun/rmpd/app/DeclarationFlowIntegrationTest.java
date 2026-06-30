@@ -11,13 +11,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.geosun.rmpd.application.dto.DeclarationUpsertDto;
 import com.geosun.rmpd.application.dto.LoginCommand;
 import com.geosun.rmpd.application.dto.PuescCredentialUpsertDto;
+import com.geosun.rmpd.domain.enums.PartyRole;
 import com.geosun.rmpd.domain.enums.PuescEnvironment;
 import com.geosun.rmpd.domain.enums.TransportType;
 import com.geosun.rmpd.domain.enums.UserRole;
 import com.geosun.rmpd.domain.model.Carrier;
+import com.geosun.rmpd.domain.model.Party;
+import com.geosun.rmpd.domain.model.Permit;
 import com.geosun.rmpd.domain.model.User;
 import com.geosun.rmpd.domain.model.Vehicle;
 import com.geosun.rmpd.infrastructure.persistence.CarrierRepository;
+import com.geosun.rmpd.infrastructure.persistence.PartyRepository;
+import com.geosun.rmpd.infrastructure.persistence.PermitRepository;
 import com.geosun.rmpd.infrastructure.persistence.UserRepository;
 import com.geosun.rmpd.infrastructure.persistence.VehicleRepository;
 import java.time.LocalDate;
@@ -53,14 +58,25 @@ class DeclarationFlowIntegrationTest {
     private VehicleRepository vehicleRepository;
 
     @Autowired
+    private PermitRepository permitRepository;
+
+    @Autowired
+    private PartyRepository partyRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     private String accessToken;
     private long vehicleId;
+    private long permitId;
+    private long senderId;
+    private long receiverId;
 
     @BeforeEach
     void seed() throws Exception {
         vehicleRepository.deleteAll();
+        permitRepository.deleteAll();
+        partyRepository.deleteAll();
         userRepository.deleteAll();
         carrierRepository.deleteAll();
 
@@ -87,6 +103,36 @@ class DeclarationFlowIntegrationTest {
         vehicle.setGpsDeviceId("GPS-001");
         vehicle = vehicleRepository.save(vehicle);
         vehicleId = vehicle.getId();
+
+        Permit permit = new Permit();
+        permit.setCarrier(carrier);
+        permit.setPermitType("EKMT");
+        permit.setPermitNumber("PERMIT-001");
+        permit.setValidUntil(LocalDate.now().plusYears(1));
+        permit = permitRepository.save(permit);
+        permitId = permit.getId();
+
+        Party sender = new Party();
+        sender.setCarrier(carrier);
+        sender.setPartyRole(PartyRole.SENDER);
+        sender.setIdType("INNY");
+        sender.setIdNumber("SENDER-1");
+        sender.setName("Sender Co");
+        sender.setAddressJson(
+                "{\"country\":\"UA\",\"city\":\"Kyiv\",\"postalCode\":\"01001\",\"street\":\"S\",\"buildingNumber\":\"1\",\"unitNumber\":\"BRAK\"}");
+        sender = partyRepository.save(sender);
+        senderId = sender.getId();
+
+        Party receiver = new Party();
+        receiver.setCarrier(carrier);
+        receiver.setPartyRole(PartyRole.RECEIVER);
+        receiver.setIdType("INNY");
+        receiver.setIdNumber("RECEIVER-1");
+        receiver.setName("Receiver Co");
+        receiver.setAddressJson(
+                "{\"country\":\"PL\",\"city\":\"Warsaw\",\"postalCode\":\"00-001\",\"street\":\"R\",\"buildingNumber\":\"2\",\"unitNumber\":\"BRAK\"}");
+        receiver = partyRepository.save(receiver);
+        receiverId = receiver.getId();
 
         accessToken = login();
 
@@ -117,11 +163,12 @@ class DeclarationFlowIntegrationTest {
                 "UA",
                 "PL",
                 vehicleId,
+                permitId,
+                senderId,
+                receiverId,
+                "[{\"type\":\"ENTRY\",\"name\":\"Swiecko\",\"country\":\"PL\"}]",
                 null,
-                null,
-                null,
-                null,
-                null);
+                true);
 
         mockMvc.perform(put("/api/v1/declarations/" + id)
                         .header("Authorization", "Bearer " + accessToken)

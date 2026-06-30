@@ -22,5 +22,7 @@ public record DeclarationDto(
         String puescSysRef,
         String referenceNumber,
         String comment,
+        Boolean termsAccepted,
+        Integer completionPercent,
         Instant createdAt,
         Instant updatedAt) {}

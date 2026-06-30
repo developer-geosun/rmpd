@@ -14,140 +14,277 @@
     @if (polling()) {
       <mat-spinner diameter="24" />
     }
+    @if (saving()) {
+      <span class="autosave-hint">Збереження…</span>
+    }
   }
 </div>
 
-<div class="grid">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Дані декларації</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <form [formGroup]="form" class="form-grid">
-        <mat-form-field>
-          <mat-label>Тип перевезення</mat-label>
-          <mat-select formControlName="transportType">
-            <mat-option value="LADEN">Laden</mat-option>
-            <mat-option value="EMPTY">Empty</mat-option>
-            <mat-option value="TRANSIT">Transit</mat-option>
-            <mat-option value="CABOTAGE">Cabotage</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>CMR №</mat-label>
-          <input matInput formControlName="cmrNumber" />
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Дата початку</mat-label>
-          <input matInput type="date" formControlName="routeStartDate" />
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Дата завершення</mat-label>
-          <input matInput type="date" formControlName="routeEndDate" />
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Країна завантаження</mat-label>
-          <mat-select formControlName="loadingCountry">
-            @for (c of countries; track c.code) {
-              <mat-option [value]="c.code">{{ c.code }} — {{ c.labelPl }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Країна розвантаження</mat-label>
-          <mat-select formControlName="unloadingCountry">
-            @for (c of countries; track c.code) {
-              <mat-option [value]="c.code">{{ c.code }} — {{ c.labelPl }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Транспортний засіб</mat-label>
-          <mat-select formControlName="vehicleId">
-            @for (v of vehicles; track v.id) {
-              <mat-option [value]="v.id">{{ v.tractorNumber }} ({{ v.registrationCountry }})</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Дозвіл</mat-label>
-          <mat-select formControlName="permitId">
-            <mat-option [value]="null">—</mat-option>
-            @for (p of permits; track p.id) {
-              <mat-option [value]="p.id">{{ p.permitNumber }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field class="full">
-          <mat-label>Коментар</mat-label>
-          <textarea matInput rows="2" formControlName="comment"></textarea>
-        </mat-form-field>
-      </form>
-
-      <div class="actions">
-        <button mat-stroked-button type="button" (click)="save()">Зберегти</button>
-        <button mat-stroked-button type="button" (click)="validate()">Перевірити</button>
-        <button mat-stroked-button type="button" (click)="downloadXml()">XML</button>
-        <button mat-flat-button color="primary" type="button" [disabled]="submitting()" (click)="submit()">
-          Відправити в PUESC
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>CMR — автозаповнення</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="cmr-drop">
-        <input type="file" accept=".pdf,.png,.jpg,.jpeg,.txt" (change)="onCmrSelected($event)" />
-        <p>PDF, PNG, JPEG або TXT (до 10 МБ)</p>
-      </div>
-
-      @if (cmr(); as doc) {
-        <p>Файл: {{ doc.originalFilename }}</p>
-        <mat-list>
-          @for (field of doc.extractedFields; track field.fieldKey) {
-            <mat-list-item>
-              <mat-checkbox
-                [checked]="selectedFields().has(field.fieldKey)"
-                (change)="toggleField(field.fieldKey, $event.checked)"
-              >
-                {{ field.fieldKey }}: {{ field.value }}
-              </mat-checkbox>
-              <mat-chip [class]="confidenceClass(field)">
-                {{ (field.confidence * 100) | number: '1.0-0' }}%
-              </mat-chip>
-            </mat-list-item>
-          }
-        </mat-list>
-        <button mat-flat-button color="accent" type="button" (click)="applyCmr()">Застосувати вибрані</button>
-      }
-    </mat-card-content>
-  </mat-card>
-
-  <mat-card class="full-width">
-    <mat-card-header>
-      <mat-card-title>Історія подій</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <mat-list>
-        @for (e of events(); track e.id) {
-          <mat-list-item>
-            <span matListItemTitle>{{ e.eventType }}</span>
-            <span matListItemLine>{{ e.createdAt | date: 'medium' }}</span>
-          </mat-list-item>
-        }
-      </mat-list>
-    </mat-card-content>
-  </mat-card>
+<div class="progress-row">
+  <mat-progress-bar mode="determinate" [value]="progressPercent()" />
+  <span>{{ progressPercent() }}%</span>
 </div>
+
+@if (missingFields().length > 0) {
+  <p class="missing-hint">Залишилось: {{ missingFields().join(', ') }}</p>
+}
+
+<mat-card class="wizard-card">
+  <mat-card-content>
+    <form [formGroup]="form">
+      <mat-stepper linear #stepper (selectionChange)="onStepChange()">
+        <mat-step label="Перевізник">
+          <div class="step-body">
+            <p>Дані перевізника беруться з профілю компанії.</p>
+            @if (carrier(); as c) {
+              <dl class="summary-dl">
+                <dt>Назва</dt><dd>{{ c.name }}</dd>
+                <dt>ID</dt><dd>{{ c.idType }} / {{ c.idNumber }}</dd>
+                <dt>Email</dt><dd>{{ c.email }}</dd>
+                <dt>Адреса</dt>
+                <dd>{{ c.address.city }}, {{ c.address.street }} {{ c.address.buildingNumber }}, {{ c.address.country }}</dd>
+              </dl>
+            }
+            <a mat-stroked-button routerLink="/settings/carrier">Редагувати профіль</a>
+          </div>
+          <div class="step-actions">
+            <button mat-flat-button color="primary" matStepperNext type="button">Далі</button>
+          </div>
+        </mat-step>
+
+        <mat-step label="Транспорт" [stepControl]="form.controls.vehicleId">
+          <div class="step-body form-grid">
+            <mat-form-field class="full">
+              <mat-label>Транспортний засіб</mat-label>
+              <mat-select formControlName="vehicleId">
+                @for (v of vehicles; track v.id) {
+                  <mat-option [value]="v.id">{{ vehicleLabel(v) }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="step-actions">
+            <button mat-button matStepperPrevious type="button">Назад</button>
+            <button mat-flat-button color="primary" matStepperNext type="button">Далі</button>
+          </div>
+        </mat-step>
+
+        <mat-step label="Дозвіл" [optional]="!requiresPermit()" [stepControl]="form.controls.permitId">
+          <div class="step-body form-grid">
+            @if (requiresPermit()) {
+              <mat-form-field class="full">
+                <mat-label>Дозвіл</mat-label>
+                <mat-select formControlName="permitId">
+                  @for (p of permits; track p.id) {
+                    <mat-option [value]="p.id">{{ p.permitNumber }} ({{ p.permitType }})</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            } @else {
+              <p>Для типу {{ form.controls.transportType.value }} дозвіл не обов'язковий.</p>
+            }
+          </div>
+          <div class="step-actions">
+            <button mat-button matStepperPrevious type="button">Назад</button>
+            <button mat-flat-button color="primary" matStepperNext type="button">Далі</button>
+          </div>
+        </mat-step>
+
+        <mat-step label="Маршрут">
+          <div class="step-body form-grid">
+            <mat-form-field>
+              <mat-label>Тип перевезення</mat-label>
+              <mat-select formControlName="transportType">
+                @for (t of transportTypes; track t.value) {
+                  <mat-option [value]="t.value">{{ t.label }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>CMR №</mat-label>
+              <input matInput formControlName="cmrNumber" />
+              @if (form.controls.cmrNumber.hasError('latin')) {
+                <mat-error>Лише латиниця</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Дата початку</mat-label>
+              <input matInput type="date" formControlName="routeStartDate" />
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Дата завершення</mat-label>
+              <input matInput type="date" formControlName="routeEndDate" />
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Країна завантаження</mat-label>
+              <mat-select formControlName="loadingCountry">
+                @for (c of countries; track c.code) {
+                  <mat-option [value]="c.code">{{ c.code }} — {{ c.labelPl }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Країна розвантаження</mat-label>
+              <mat-select formControlName="unloadingCountry">
+                @for (c of countries; track c.code) {
+                  <mat-option [value]="c.code">{{ c.code }} — {{ c.labelPl }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <div class="full route-points">
+              <h3>Точки маршруту в Польщі</h3>
+              <div formArrayName="routePoints">
+                @for (point of routePoints.controls; track $index; let i = $index) {
+                  <div class="route-point-row" [formGroupName]="i">
+                    <mat-form-field>
+                      <mat-label>Тип</mat-label>
+                      <mat-select formControlName="type">
+                        @for (rt of routePointTypes; track rt.value) {
+                          <mat-option [value]="rt.value">{{ rt.label }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                    <mat-form-field>
+                      <mat-label>Назва пункту</mat-label>
+                      <input matInput formControlName="name" />
+                    </mat-form-field>
+                    <mat-form-field>
+                      <mat-label>Країна</mat-label>
+                      <input matInput formControlName="country" />
+                    </mat-form-field>
+                    <button mat-icon-button type="button" (click)="removeRoutePoint(i)" [disabled]="routePoints.length <= 1">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                }
+              </div>
+              <button mat-stroked-button type="button" (click)="addRoutePoint()">
+                <mat-icon>add</mat-icon>
+                Додати точку
+              </button>
+            </div>
+          </div>
+          <div class="step-actions">
+            <button mat-button matStepperPrevious type="button">Назад</button>
+            <button mat-flat-button color="primary" matStepperNext type="button">Далі</button>
+          </div>
+        </mat-step>
+
+        <mat-step label="Контрагенти" [optional]="!requiresParties()">
+          <div class="step-body form-grid">
+            @if (requiresParties()) {
+              <mat-form-field>
+                <mat-label>Відправник (Nadawca)</mat-label>
+                <mat-select formControlName="senderPartyId">
+                  @for (p of senderParties(); track p.id) {
+                    <mat-option [value]="p.id">{{ partyLabel(p) }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field>
+                <mat-label>Отримувач (Odbiorca)</mat-label>
+                <mat-select formControlName="receiverPartyId">
+                  @for (p of receiverParties(); track p.id) {
+                    <mat-option [value]="p.id">{{ partyLabel(p) }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            } @else {
+              <p class="full">Для типу {{ form.controls.transportType.value }} відправник і отримувач не потрібні.</p>
+            }
+          </div>
+          <div class="step-actions">
+            <button mat-button matStepperPrevious type="button">Назад</button>
+            <button mat-flat-button color="primary" matStepperNext type="button">Далі</button>
+          </div>
+        </mat-step>
+
+        <mat-step label="Підтвердження">
+          <div class="step-body">
+            <h3>Підсумок</h3>
+            <dl class="summary-dl">
+              <dt>ТЗ</dt>
+              <dd>
+                @for (v of vehicles; track v.id) {
+                  @if (v.id === form.controls.vehicleId.value) {
+                    {{ vehicleLabel(v) }}
+                  }
+                }
+              </dd>
+              <dt>Тип</dt><dd>{{ form.controls.transportType.value }}</dd>
+              <dt>Маршрут</dt>
+              <dd>{{ countryLabel(form.controls.loadingCountry.value) }} → {{ countryLabel(form.controls.unloadingCountry.value) }}</dd>
+              <dt>Дати</dt>
+              <dd>{{ form.controls.routeStartDate.value }} — {{ form.controls.routeEndDate.value }}</dd>
+            </dl>
+
+            <mat-form-field class="full">
+              <mat-label>Коментар</mat-label>
+              <textarea matInput rows="2" formControlName="comment"></textarea>
+            </mat-form-field>
+
+            <mat-checkbox formControlName="termsAccepted">
+              Підтверджую правильність даних та згоду з вимогами RMPD100 (Oświadczenia)
+            </mat-checkbox>
+
+            <div class="cmr-section">
+              <h3>CMR — автозаповнення</h3>
+              <div class="cmr-drop">
+                <input type="file" accept=".pdf,.png,.jpg,.jpeg,.txt" (change)="onCmrSelected($event)" />
+                <p>PDF, PNG, JPEG або TXT (до 10 МБ)</p>
+              </div>
+              @if (cmr(); as doc) {
+                <p>Файл: {{ doc.originalFilename }}</p>
+                <mat-list>
+                  @for (field of doc.extractedFields; track field.fieldKey) {
+                    <mat-list-item>
+                      <mat-checkbox
+                        [checked]="selectedFields().has(field.fieldKey)"
+                        (change)="toggleField(field.fieldKey, $event.checked)"
+                      >
+                        {{ field.fieldKey }}: {{ field.value }}
+                      </mat-checkbox>
+                      <mat-chip [class]="confidenceClass(field)">
+                        {{ (field.confidence * 100) | number: '1.0-0' }}%
+                      </mat-chip>
+                    </mat-list-item>
+                  }
+                </mat-list>
+                <button mat-stroked-button type="button" (click)="applyCmr()">Застосувати вибрані</button>
+              }
+            </div>
+
+            <div class="actions">
+              <button mat-stroked-button type="button" (click)="save()">Зберегти зараз</button>
+              <button mat-stroked-button type="button" (click)="validate()">Перевірити</button>
+              <button mat-stroked-button type="button" (click)="downloadXml()">XML</button>
+              <button mat-flat-button color="primary" type="button" [disabled]="submitting()" (click)="submit()">
+                Відправити в PUESC
+              </button>
+            </div>
+
+            <h3>Історія подій</h3>
+            <mat-list>
+              @for (e of events(); track e.id) {
+                <mat-list-item>
+                  <span matListItemTitle>{{ e.eventType }}</span>
+                  <span matListItemLine>{{ e.createdAt | date: 'medium' }}</span>
+                </mat-list-item>
+              }
+            </mat-list>
+          </div>
+          <div class="step-actions">
+            <button mat-button matStepperPrevious type="button">Назад</button>
+          </div>
+        </mat-step>
+      </mat-stepper>
+    </form>
+  </mat-card-content>
+</mat-card>
