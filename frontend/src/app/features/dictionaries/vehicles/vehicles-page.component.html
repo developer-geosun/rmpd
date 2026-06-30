@@ -1,0 +1,33 @@
+<h2>Транспортні засоби</h2>
+<button mat-flat-button color="primary" (click)="openCreate()">
+  <mat-icon>add</mat-icon>
+  Додати ТЗ
+</button>
+
+<table mat-table [dataSource]="items()" class="mat-elevation-z1">
+  <ng-container matColumnDef="country">
+    <th mat-header-cell *matHeaderCellDef>Країна</th>
+    <td mat-cell *matCellDef="let row">{{ row.registrationCountry }}</td>
+  </ng-container>
+  <ng-container matColumnDef="tractor">
+    <th mat-header-cell *matHeaderCellDef>Тягач</th>
+    <td mat-cell *matCellDef="let row">{{ row.tractorNumber }}</td>
+  </ng-container>
+  <ng-container matColumnDef="trailer">
+    <th mat-header-cell *matHeaderCellDef>Причіп</th>
+    <td mat-cell *matCellDef="let row">{{ row.trailerNumber || '—' }}</td>
+  </ng-container>
+  <ng-container matColumnDef="gps">
+    <th mat-header-cell *matHeaderCellDef>GPS</th>
+    <td mat-cell *matCellDef="let row">{{ row.gpsDeviceId }}</td>
+  </ng-container>
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let row">
+      <button mat-icon-button (click)="openEdit(row)"><mat-icon>edit</mat-icon></button>
+      <button mat-icon-button color="warn" (click)="delete(row)"><mat-icon>delete</mat-icon></button>
+    </td>
+  </ng-container>
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+</table>

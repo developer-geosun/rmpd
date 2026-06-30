@@ -1,0 +1,37 @@
+<mat-card>
+  <mat-card-header>
+    <mat-icon mat-card-avatar>local_shipping</mat-icon>
+    <mat-card-title>RMPD — фаза 0</mat-card-title>
+    <mat-card-subtitle>Scaffold Angular + Spring Boot + MySQL</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    @if (loading()) {
+      <div class="center">
+        <mat-spinner diameter="40" />
+      </div>
+    } @else if (error()) {
+      <p class="error">{{ error() }}</p>
+      <p>Переконайтеся, що backend запущено на порту 8080, або виконайте <code>docker compose up</code>.</p>
+    } @else if (health()) {
+      <p>Backend доступний через проксі <code>/api/v1</code>.</p>
+      <mat-chip-set>
+        <mat-chip highlighted>Статус: {{ health()!.status }}</mat-chip>
+        <mat-chip>Версія: {{ health()!.version }}</mat-chip>
+        <mat-chip [color]="health()!.xsdAvailable ? 'primary' : undefined">
+          XSD: {{ health()!.xsdAvailable ? 'знайдено' : 'не знайдено (завантажте specs/)' }}
+        </mat-chip>
+      </mat-chip-set>
+    }
+  </mat-card-content>
+
+  <mat-card-actions>
+    <button mat-stroked-button type="button" (click)="refresh()">
+      <mat-icon>refresh</mat-icon>
+      Оновити
+    </button>
+    <a mat-button href="/swagger-ui/index.html" target="_blank" rel="noopener">
+      OpenAPI
+    </a>
+  </mat-card-actions>
+</mat-card>

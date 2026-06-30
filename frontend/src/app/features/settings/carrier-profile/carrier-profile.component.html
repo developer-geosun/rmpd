@@ -1,0 +1,56 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Профіль перевізника</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    @if (loading) {
+      <p>Завантаження…</p>
+    } @else {
+      <form [formGroup]="form" class="grid" (ngSubmit)="save()">
+        <mat-form-field appearance="outline">
+          <mat-label>Тип ID</mat-label>
+          <input matInput formControlName="idType" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Номер ID</mat-label>
+          <input matInput formControlName="idNumber" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="span-2">
+          <mat-label>Назва (латиниця)</mat-label>
+          <input matInput formControlName="name" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="span-2">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Країна</mat-label>
+          <input matInput formControlName="country" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Місто</mat-label>
+          <input matInput formControlName="city" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Індекс</mat-label>
+          <input matInput formControlName="postalCode" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Вулиця</mat-label>
+          <input matInput formControlName="street" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Будинок</mat-label>
+          <input matInput formControlName="buildingNumber" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Офіс</mat-label>
+          <input matInput formControlName="unitNumber" />
+        </mat-form-field>
+        <div class="span-2 actions">
+          <button mat-flat-button color="primary" type="submit">Зберегти</button>
+        </div>
+      </form>
+    }
+  </mat-card-content>
+</mat-card>

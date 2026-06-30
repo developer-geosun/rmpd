@@ -1,0 +1,40 @@
+<mat-sidenav-container class="shell-container">
+  <mat-sidenav mode="side" opened class="shell-sidenav">
+    <div class="brand">RMPD</div>
+    <mat-nav-list>
+      <a mat-list-item routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <mat-icon matListItemIcon>home</mat-icon>
+        <span matListItemTitle>Головна</span>
+      </a>
+      <a mat-list-item routerLink="/declarations" routerLinkActive="active">
+        <mat-icon matListItemIcon>description</mat-icon>
+        <span matListItemTitle>Декларації</span>
+      </a>
+      <a mat-list-item routerLink="/dictionaries" routerLinkActive="active">
+        <mat-icon matListItemIcon>menu_book</mat-icon>
+        <span matListItemTitle>Довідники</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar color="primary">
+      <span>Система RMPD100</span>
+      <span class="spacer"></span>
+      @if (user(); as u) {
+        <span class="user">{{ u.email }} ({{ u.role }})</span>
+      }
+      @if (health$ | async; as health) {
+        <span class="health-badge" [class.health-ok]="health.status === 'UP'">
+          API: {{ health.status }}
+        </span>
+      }
+      <button mat-icon-button type="button" (click)="logout()" aria-label="Вийти">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </mat-toolbar>
+    <main class="shell-content">
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

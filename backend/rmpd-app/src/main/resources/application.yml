@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: rmpd
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/rmpd?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${SPRING_DATASOURCE_USERNAME:rmpd}
+    password: ${SPRING_DATASOURCE_PASSWORD:rmpd}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized
+
+rmpd:
+  version: 0.1.0-SNAPSHOT
+  xsd-path: ${RMPD_XSD_PATH:../specs/rmpd/RMPD_v20.11.2024}
+  jwt:
+    secret: ${RMPD_JWT_SECRET:change-me-in-production-use-256-bit-secret-key!!}
+    access-token-ttl-minutes: 15
+    refresh-token-ttl-days: 7
+
+puesc:
+  env: ${PUESC_ENV:test}
+  wsdl-url: ${PUESC_WSDL_URL:https://te-ws.puesc.gov.pl/seap_wsChannel/DocumentHandlingPort?wsdl}
+  target-system: ${PUESC_TARGET_SYSTEM:SENT}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui

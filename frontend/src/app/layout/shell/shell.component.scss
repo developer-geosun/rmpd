@@ -1,0 +1,40 @@
+.shell-container {
+  height: 100vh;
+}
+
+.shell-sidenav {
+  width: 240px;
+}
+
+.brand {
+  padding: 1rem 1.25rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.shell-content {
+  padding: 1.5rem;
+}
+
+.user {
+  margin-right: 1rem;
+  font-size: 0.875rem;
+}
+
+.health-badge {
+  font-size: 0.875rem;
+  opacity: 0.85;
+  margin-right: 0.5rem;
+}
+
+.health-ok {
+  opacity: 1;
+}
+
+a.active {
+  background: rgba(0, 0, 0, 0.04);
+}

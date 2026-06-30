@@ -1,0 +1,60 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: rmpd-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-rmpd}
+      MYSQL_USER: ${MYSQL_USER:-rmpd}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-rmpd}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  backend:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.backend
+    container_name: rmpd-backend
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:mysql://mysql:3306/rmpd?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-rmpd}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-rmpd}
+      RMPD_XSD_PATH: ${RMPD_XSD_PATH:-/app/specs/rmpd/RMPD_v20.11.2024}
+      PUESC_ENV: ${PUESC_ENV:-test}
+      PUESC_WSDL_URL: ${PUESC_WSDL_URL:-https://te-ws.puesc.gov.pl/seap_wsChannel/DocumentHandlingPort?wsdl}
+      PUESC_TARGET_SYSTEM: ${PUESC_TARGET_SYSTEM:-SENT}
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../specs:/app/specs:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.frontend
+    container_name: rmpd-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "4200:80"
+
+volumes:
+  mysql_data:

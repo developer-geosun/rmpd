@@ -6,6 +6,56 @@
 
 RMPD (Rejestracja Międzynarodowych Przewozów Drogowych) — обязательная регистрация международных автомобильных перевозок и каботажа на территории Польши для иностранных перевозчиков (ст. 28b закона о дорожном транспорте).
 
+## Быстрый старт (фаза 0)
+
+### Требования
+
+- Java 21, Maven 3.9+
+- Node.js 22+, npm
+- Docker Desktop (для compose)
+
+### Спецификации PUESC
+
+Скачайте XSD и WSDL по инструкции в [specs/README.md](specs/README.md) и распакуйте в `specs/rmpd/` и `specs/seap/`.
+
+### Локальная разработка
+
+```powershell
+# Backend (порт 8080)
+mvn -f backend/pom.xml spring-boot:run -pl rmpd-app -am
+
+# Frontend (порт 4200, прокси /api → backend)
+cd frontend
+npm start
+```
+
+- UI: http://localhost:4200
+- API health: http://localhost:8080/api/v1/health
+- Swagger UI: http://localhost:8080/swagger-ui/index.html
+
+### Docker Compose
+
+```powershell
+cd deploy
+copy .env.example .env
+docker compose up --build
+```
+
+- UI: http://localhost:4200
+- Backend: http://localhost:8080
+- MySQL (host): порт **3307** (внутри compose — 3306)
+
+## Структура репозитория
+
+```
+rmpd/
+├── frontend/          # Angular 19 + Material
+├── backend/           # Spring Boot 3 multi-module
+├── deploy/            # Docker Compose, Dockerfiles
+├── specs/             # XSD/WSDL (вручную с PUESC)
+└── docs/              # Документация
+```
+
 ## Документация
 
 | Документ | Описание |
@@ -26,4 +76,12 @@ RMPD (Rejestracja Międzynarodowych Przewozów Drogowych) — обязатель
 
 ## Статус проекта
 
-На этапе проектирования. Исходные спецификации XSD необходимо скачать с портала PUESC (архив `RMPD_v20.11.2024`) и разместить в `specs/rmpd/`.
+**Фаза 0:** scaffold монорепозитория, Docker Compose, CI, OpenAPI skeleton.
+
+**Фаза 1 / Спринт 1:** JWT auth, multi-tenant CRUD справочников, профиль перевозчика.
+
+Demo-вхід (після старту backend): `admin@demo.local` / `admin123`
+
+> При обновлении с фазы 0 сбросьте volume MySQL в Docker (`docker compose down -v`), т.к. таблица `user` переименована в `rmpd_user`.
+
+Следующий шаг — спринт 2: CRUD деклараций, мастер RMPD100 (шаги 1–2).

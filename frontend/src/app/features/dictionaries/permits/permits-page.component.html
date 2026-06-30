@@ -1,0 +1,13 @@
+<h2>Дозволи</h2>
+<button mat-flat-button color="primary" (click)="openCreate()"><mat-icon>add</mat-icon> Додати</button>
+<table mat-table [dataSource]="items()" class="mat-elevation-z1">
+  <ng-container matColumnDef="type"><th mat-header-cell *matHeaderCellDef>Тип</th><td mat-cell *matCellDef="let r">{{ r.permitType }}</td></ng-container>
+  <ng-container matColumnDef="number"><th mat-header-cell *matHeaderCellDef>Номер</th><td mat-cell *matCellDef="let r">{{ r.permitNumber }}</td></ng-container>
+  <ng-container matColumnDef="validUntil"><th mat-header-cell *matHeaderCellDef>Дійсний до</th><td mat-cell *matCellDef="let r">{{ r.validUntil }}</td></ng-container>
+  <ng-container matColumnDef="actions"><th mat-header-cell *matHeaderCellDef></th><td mat-cell *matCellDef="let r">
+    <button mat-icon-button (click)="openEdit(r)"><mat-icon>edit</mat-icon></button>
+    <button mat-icon-button color="warn" (click)="delete(r)"><mat-icon>delete</mat-icon></button>
+  </td></ng-container>
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+</table>

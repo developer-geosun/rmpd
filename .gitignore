@@ -1,0 +1,43 @@
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Java / Maven
+backend/**/target/
+*.class
+*.jar
+*.war
+*.log
+
+# Node / Angular
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/.sass-cache/
+npm-debug.log*
+
+# Env and secrets
+.env
+.env.local
+*.p12
+*.pem
+certs/
+
+# PUESC specs (завантажуються вручну)
+specs/rmpd/RMPD_v*/
+specs/seap/*.wsdl
+specs/seap/*.xsd
+specs/seap/*.zip
+
+# Test data
+testdata/
+
+# Docker volumes
+deploy/mysql_data/
