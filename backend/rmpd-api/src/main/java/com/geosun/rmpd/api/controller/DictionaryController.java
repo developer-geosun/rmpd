@@ -1,8 +1,8 @@
 package com.geosun.rmpd.api.controller;
 
-import com.geosun.rmpd.api.dto.ApiStubResponse;
 import com.geosun.rmpd.api.dto.DictionaryEntryResponse;
 import com.geosun.rmpd.api.dto.DictionaryResponse;
+import com.geosun.rmpd.application.service.DictionaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -17,15 +17,18 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Dictionaries", description = "Словники PUESC")
 public class DictionaryController {
 
+    private final DictionaryService dictionaryService;
+
+    public DictionaryController(DictionaryService dictionaryService) {
+        this.dictionaryService = dictionaryService;
+    }
+
     @GetMapping("/{type}")
     @Operation(summary = "Отримати словник за типом (country, id_type, …)")
     public ResponseEntity<DictionaryResponse> getByType(@PathVariable String type) {
-        if ("country".equals(type)) {
-            return ResponseEntity.ok(new DictionaryResponse(type, List.of(
-                    new DictionaryEntryResponse("PL", "Polska", "Poland"),
-                    new DictionaryEntryResponse("UA", "Ukraina", "Ukraine"),
-                    new DictionaryEntryResponse("DE", "Niemcy", "Germany"))));
-        }
-        return ResponseEntity.ok(new DictionaryResponse(type, List.of()));
+        List<DictionaryEntryResponse> entries = dictionaryService.getByType(type).stream()
+                .map(e -> new DictionaryEntryResponse(e.code(), e.labelPl(), e.labelEn()))
+                .toList();
+        return ResponseEntity.ok(new DictionaryResponse(type, entries));
     }
 }

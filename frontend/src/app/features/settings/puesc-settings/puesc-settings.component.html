@@ -1,0 +1,53 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Налаштування PUESC (test)</mat-card-title>
+    <mat-card-subtitle>Облікові дані SEAP WebService</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="form" class="form">
+      <mat-form-field class="full">
+        <mat-label>Email PUESC</mat-label>
+        <input matInput type="email" formControlName="username" autocomplete="username" />
+      </mat-form-field>
+
+      <mat-form-field class="full">
+        <mat-label>Пароль</mat-label>
+        <input matInput type="password" formControlName="password" autocomplete="new-password" />
+        <mat-hint>
+          @if (passwordConfigured()) {
+            Залиште порожнім, щоб не змінювати
+          } @else {
+            Обов'язково при першому збереженні
+          }
+        </mat-hint>
+      </mat-form-field>
+
+      <mat-form-field class="full">
+        <mat-label>Шлях до сертифіката підпису (P12)</mat-label>
+        <input matInput formControlName="signingCertPath" />
+      </mat-form-field>
+
+      <div class="actions">
+        <button mat-flat-button color="primary" type="button" (click)="save()">Зберегти</button>
+        <button mat-stroked-button type="button" (click)="test()">Тест з'єднання</button>
+      </div>
+
+      @if (testResult(); as t) {
+        <p [class.ok]="t.success" [class.err]="!t.success">
+          {{ t.message }}
+          @if (t.mock) {
+            (mock)
+          }
+        </p>
+      }
+    </form>
+  </mat-card-content>
+</mat-card>
+
+<style>
+  .form { display: flex; flex-direction: column; gap: 0.5rem; max-width: 480px; }
+  .full { width: 100%; }
+  .actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+  .ok { color: #2e7d32; }
+  .err { color: #c62828; }
+</style>

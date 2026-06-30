@@ -15,3 +15,11 @@ spring:
 
 rmpd:
   xsd-path: ""
+
+puesc:
+  client: mock
+  polling:
+    enabled: false
+
+storage:
+  cmr-path: ./target/test-cmr

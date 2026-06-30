@@ -80,8 +80,12 @@ rmpd/
 
 **Фаза 1 / Спринт 1:** JWT auth, multi-tenant CRUD справочников, профиль перевозчика.
 
+**Фаза 2:** PUESC SOAP (mock/http), submit + polling, CMR OCR, email-уведомления.
+
 Demo-вхід (після старту backend): `admin@demo.local` / `admin123`
 
-> При обновлении с фазы 0 сбросьте volume MySQL в Docker (`docker compose down -v`), т.к. таблица `user` переименована в `rmpd_user`.
+> PUESC по умолчанию в режиме `mock` (`PUESC_CLIENT=mock`). Для test.puesc: `PUESC_CLIENT=http` + credentials в **PUESC** / **Налаштування PUESC**.
 
-Следующий шаг — спринт 2: CRUD деклараций, мастер RMPD100 (шаги 1–2).
+> При обновлении сбросьте volume MySQL (`docker compose down -v`) при смене схемы Flyway.
+
+Следующий шаг — полный мастер RMPD100 (спринты 2–4 фазы 1).

@@ -15,6 +15,9 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
 
 server:
   port: ${SERVER_PORT:8080}
@@ -35,11 +38,24 @@ rmpd:
     secret: ${RMPD_JWT_SECRET:change-me-in-production-use-256-bit-secret-key!!}
     access-token-ttl-minutes: 15
     refresh-token-ttl-days: 7
+  crypto:
+    secret: ${RMPD_CRYPTO_SECRET:${rmpd.jwt.secret}}
+  mail:
+    enabled: ${RMPD_MAIL_ENABLED:false}
+    from: ${RMPD_MAIL_FROM:noreply@rmpd.local}
 
 puesc:
   env: ${PUESC_ENV:test}
+  client: ${PUESC_CLIENT:mock}
   wsdl-url: ${PUESC_WSDL_URL:https://te-ws.puesc.gov.pl/seap_wsChannel/DocumentHandlingPort?wsdl}
+  soap-endpoint: ${PUESC_SOAP_ENDPOINT:https://te-ws.puesc.gov.pl/seap_wsChannel/DocumentHandlingPort}
   target-system: ${PUESC_TARGET_SYSTEM:SENT}
+  polling:
+    enabled: ${PUESC_POLLING_ENABLED:true}
+    interval-ms: ${PUESC_POLLING_INTERVAL_MS:30000}
+
+storage:
+  cmr-path: ${STORAGE_CMR_PATH:./data/cmr}
 
 springdoc:
   api-docs:
