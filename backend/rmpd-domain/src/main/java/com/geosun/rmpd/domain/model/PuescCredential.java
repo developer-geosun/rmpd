@@ -44,6 +44,15 @@ public class PuescCredential {
     @Column(name = "signing_cert_path", length = 500)
     private String signingCertPath;
 
+    @Column(name = "id_sisc_rop", length = 50)
+    private String idSiscRop;
+
+    @Column(name = "id_sisc_rof", length = 50)
+    private String idSiscRof;
+
+    @Column(name = "id_sisc_p", length = 50)
+    private String idSiscP;
+
     @Column(nullable = false)
     private boolean active = true;
 
@@ -125,6 +134,30 @@ public class PuescCredential {
 
     public void setSigningCertPath(String signingCertPath) {
         this.signingCertPath = signingCertPath;
+    }
+
+    public String getIdSiscRop() {
+        return idSiscRop;
+    }
+
+    public void setIdSiscRop(String idSiscRop) {
+        this.idSiscRop = idSiscRop;
+    }
+
+    public String getIdSiscRof() {
+        return idSiscRof;
+    }
+
+    public void setIdSiscRof(String idSiscRof) {
+        this.idSiscRof = idSiscRof;
+    }
+
+    public String getIdSiscP() {
+        return idSiscP;
+    }
+
+    public void setIdSiscP(String idSiscP) {
+        this.idSiscP = idSiscP;
     }
 
     public boolean isActive() {

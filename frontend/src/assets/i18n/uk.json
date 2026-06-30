@@ -1,0 +1,102 @@
+{
+  "nav": {
+    "home": "Головна",
+    "declarations": "Декларації",
+    "puesc": "PUESC",
+    "dictionaries": "Довідники"
+  },
+  "app": {
+    "title": "Система RMPD100",
+    "logout": "Вийти"
+  },
+  "lang": {
+    "uk": "Українська",
+    "pl": "Polski",
+    "en": "English"
+  },
+  "declarations": {
+    "title": "Декларації RMPD100",
+    "new": "Нова декларація",
+    "open": "Відкрити",
+    "copy": "Копіювати",
+    "filterStatus": "Статус",
+    "all": "Усі",
+    "back": "Назад",
+    "status": "Статус",
+    "progress": "Заповнення",
+    "reference": "Референс SENT",
+    "updated": "Оновлено",
+    "saved": "Збережено",
+    "saveError": "Помилка збереження",
+    "validateOk": "Валідація пройдена",
+    "validate": "Перевірити",
+    "xml": "XML",
+    "xmlPreview": "Перегляд XML",
+    "downloadXml": "Завантажити XML",
+    "submit": "Відправити в PUESC",
+    "submitting": "Відправка в PUESC…",
+    "submitted": "Відправлено в PUESC",
+    "submitError": "Помилка відправки",
+    "copyOk": "Копію створено",
+    "copyError": "Помилка копіювання",
+    "notFound": "Декларацію не знайдено",
+    "loadError": "Помилка завантаження",
+    "createError": "Не вдалося створити",
+    "missing": "Залишилось",
+    "events": "Історія подій",
+    "saveNow": "Зберегти зараз"
+  },
+  "amend": {
+    "title": "Актуалізація RMPD",
+    "hint": "Зміна даних зареєстрованої декларації (форма RMPD)",
+    "reason": "Причина зміни",
+    "apply": "Зберегти зміни",
+    "downloadXml": "XML актуалізації",
+    "submit": "Відправити актуалізацію",
+    "submitted": "Актуалізацію відправлено",
+    "saved": "Зміни збережено"
+  },
+  "wizard": {
+    "carrier": "Перевізник",
+    "vehicle": "Транспорт",
+    "permit": "Дозвіл",
+    "route": "Маршрут",
+    "parties": "Контрагенти",
+    "confirm": "Підтвердження",
+    "next": "Далі",
+    "prev": "Назад"
+  },
+  "cmr": {
+    "title": "CMR — автозаповнення",
+    "dropHint": "Перетягніть PDF, PNG, JPEG або TXT (до 10 МБ)",
+    "recognized": "CMR розпізнано",
+    "uploadError": "Помилка завантаження CMR",
+    "apply": "Застосувати вибрані",
+    "applied": "Поля застосовано",
+    "scan": "Скан CMR",
+    "batch": "Пакет CMR",
+    "batchDone": "Завантажено {{ok}} з {{total}}",
+    "batchError": "Помилка пакетного завантаження"
+  },
+  "gps": {
+    "title": "Перевірка GPS (RMPD406)",
+    "hint": "Контроль активності GPS-локатора SENT-GEO",
+    "check": "Перевірити позицію",
+    "position": "Позиція",
+    "status": "Результат",
+    "downloadXml": "XML RMPD406",
+    "submit": "Відправити RMPD406",
+    "submitted": "RMPD406 відправлено",
+    "submitError": "Помилка відправки RMPD406"
+  },
+  "parties": {
+    "cmrHint": "З CMR",
+    "applyHint": "Підставити",
+    "hintApplied": "Контрагента підставлено"
+  },
+  "common": {
+    "close": "Закрити",
+    "ok": "OK",
+    "error": "Помилка"
+  }
+}

@@ -1,0 +1,5 @@
+[
+  {"code": "NIP", "labelPl": "NIP", "labelEn": "NIP"},
+  {"code": "VAT UE", "labelPl": "VAT UE", "labelEn": "EU VAT"},
+  {"code": "INNY", "labelPl": "Inny identyfikator", "labelEn": "Other identifier"}
+]

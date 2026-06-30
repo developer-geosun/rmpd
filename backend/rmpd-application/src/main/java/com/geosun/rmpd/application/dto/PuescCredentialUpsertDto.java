@@ -9,4 +9,7 @@ public record PuescCredentialUpsertDto(
         PuescEnvironment environment,
         @NotBlank @Email String username,
         @Size(min = 4) String password,
-        String signingCertPath) {}
+        String signingCertPath,
+        @Size(max = 50) String idSiscRop,
+        @Size(max = 50) String idSiscRof,
+        @Size(max = 50) String idSiscP) {}

@@ -44,7 +44,7 @@ public class PuescCredentialService {
     public PuescCredentialDto get() {
         return credentialRepository.findByCarrierIdAndEnvironment(SecurityUtils.requireCarrierId(), defaultEnvironment)
                 .map(this::toDto)
-                .orElse(new PuescCredentialDto(defaultEnvironment, "", false, null, false, null, null));
+                .orElse(new PuescCredentialDto(defaultEnvironment, "", false, null, null, null, null, false, null, null));
     }
 
     @Transactional
@@ -64,6 +64,9 @@ public class PuescCredentialService {
 
         credential.setUsername(dto.username());
         credential.setSigningCertPath(dto.signingCertPath());
+        credential.setIdSiscRop(blankToNull(dto.idSiscRop()));
+        credential.setIdSiscRof(blankToNull(dto.idSiscRof()));
+        credential.setIdSiscP(blankToNull(dto.idSiscP()));
         credential.setActive(true);
 
         if (dto.password() != null && !dto.password().isBlank()) {
@@ -110,8 +113,15 @@ public class PuescCredentialService {
                 credential.getUsername(),
                 credential.getPasswordEncrypted() != null,
                 credential.getSigningCertPath(),
+                credential.getIdSiscRop(),
+                credential.getIdSiscRof(),
+                credential.getIdSiscP(),
                 credential.isActive(),
                 credential.getLastTestAt(),
                 credential.getLastTestOk());
+    }
+
+    private static String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
     }
 }

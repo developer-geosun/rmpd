@@ -1,0 +1,22 @@
+[
+  {"code": "PL", "labelPl": "Polska", "labelEn": "Poland"},
+  {"code": "UA", "labelPl": "Ukraina", "labelEn": "Ukraine"},
+  {"code": "DE", "labelPl": "Niemcy", "labelEn": "Germany"},
+  {"code": "LT", "labelPl": "Litwa", "labelEn": "Lithuania"},
+  {"code": "CZ", "labelPl": "Czechy", "labelEn": "Czech Republic"},
+  {"code": "SK", "labelPl": "Słowacja", "labelEn": "Slovakia"},
+  {"code": "BY", "labelPl": "Białoruś", "labelEn": "Belarus"},
+  {"code": "RO", "labelPl": "Rumunia", "labelEn": "Romania"},
+  {"code": "HU", "labelPl": "Węgry", "labelEn": "Hungary"},
+  {"code": "FR", "labelPl": "Francja", "labelEn": "France"},
+  {"code": "IT", "labelPl": "Włochy", "labelEn": "Italy"},
+  {"code": "ES", "labelPl": "Hiszpania", "labelEn": "Spain"},
+  {"code": "BE", "labelPl": "Belgia", "labelEn": "Belgium"},
+  {"code": "NL", "labelPl": "Holandia", "labelEn": "Netherlands"},
+  {"code": "AT", "labelPl": "Austria", "labelEn": "Austria"},
+  {"code": "BG", "labelPl": "Bułgaria", "labelEn": "Bulgaria"},
+  {"code": "LV", "labelPl": "Łotwa", "labelEn": "Latvia"},
+  {"code": "EE", "labelPl": "Estonia", "labelEn": "Estonia"},
+  {"code": "MD", "labelPl": "Mołdawia", "labelEn": "Moldova"},
+  {"code": "TR", "labelPl": "Turcja", "labelEn": "Turkey"}
+]

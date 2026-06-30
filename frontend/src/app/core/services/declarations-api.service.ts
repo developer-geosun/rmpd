@@ -1,13 +1,16 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
-import {
+import { Observable, map, switchMap } from 'rxjs';
+import { AmendmentRequest,
+  CmrBatchResult,
   CmrDocument,
+  CmrPartySuggestions,
   Declaration,
   DeclarationEvent,
   DeclarationProgress,
   DeclarationUpsert,
   DictionaryEntry,
+  GpsCheckResult,
   PuescConnectionTest,
   PuescCredential,
   PuescCredentialUpsert,
@@ -51,6 +54,16 @@ export class DeclarationsApiService {
     return this.http.get(`/api/v1/declarations/${id}/xml`, { responseType: 'blob' });
   }
 
+  fetchXmlText(id: number): Observable<string> {
+    return this.downloadXml(id).pipe(
+      switchMap((blob) => blob.text()),
+    );
+  }
+
+  fetchCmrPreview(declarationId: number): Observable<Blob> {
+    return this.http.get(`/api/v1/declarations/${declarationId}/cmr/preview`, { responseType: 'blob' });
+  }
+
   submit(id: number): Observable<SubmitResult> {
     return this.http.post<SubmitResult>(`/api/v1/declarations/${id}/submit`, {});
   }
@@ -79,6 +92,42 @@ export class DeclarationsApiService {
 
   applyCmr(declarationId: number, fieldKeys: string[]): Observable<Declaration> {
     return this.http.post<Declaration>(`/api/v1/declarations/${declarationId}/cmr/apply`, { fieldKeys });
+  }
+
+  amend(id: number, data: AmendmentRequest): Observable<Declaration> {
+    return this.http.put<Declaration>(`/api/v1/declarations/${id}/amend`, data);
+  }
+
+  submitAmendment(id: number, data: AmendmentRequest): Observable<SubmitResult> {
+    return this.http.post<SubmitResult>(`/api/v1/declarations/${id}/amend/submit`, data);
+  }
+
+  downloadAmendXml(id: number): Observable<Blob> {
+    return this.http.get(`/api/v1/declarations/${id}/amend/xml`, { responseType: 'blob' });
+  }
+
+  gpsCheck(id: number): Observable<GpsCheckResult> {
+    return this.http.get<GpsCheckResult>(`/api/v1/declarations/${id}/gps-check`);
+  }
+
+  submitGpsCheck(id: number): Observable<SubmitResult> {
+    return this.http.post<SubmitResult>(`/api/v1/declarations/${id}/gps-check/submit`, {});
+  }
+
+  downloadGpsCheckXml(id: number): Observable<Blob> {
+    return this.http.get(`/api/v1/declarations/${id}/gps-check/xml`, { responseType: 'blob' });
+  }
+
+  batchUploadCmr(files: File[]): Observable<CmrBatchResult> {
+    const form = new FormData();
+    for (const file of files) {
+      form.append('files', file);
+    }
+    return this.http.post<CmrBatchResult>('/api/v1/cmr/batch', form);
+  }
+
+  getCmrPartySuggestions(declarationId: number): Observable<CmrPartySuggestions> {
+    return this.http.get<CmrPartySuggestions>(`/api/v1/declarations/${declarationId}/cmr/party-suggestions`);
   }
 
   getPuescSettings(): Observable<PuescCredential> {

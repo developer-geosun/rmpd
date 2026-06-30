@@ -8,4 +8,5 @@ public record CmrDocumentDto(
         String mimeType,
         long fileSizeBytes,
         List<CmrExtractedFieldDto> extractedFields,
-        String appliedAt) {}
+        String appliedAt,
+        String previewUrl) {}

@@ -2,14 +2,17 @@ package com.geosun.rmpd.api.controller;
 
 import com.geosun.rmpd.application.dto.CmrApplyRequestDto;
 import com.geosun.rmpd.application.dto.CmrDocumentDto;
+import com.geosun.rmpd.application.dto.CmrPartySuggestionsDto;
 import com.geosun.rmpd.application.dto.CmrUploadCommand;
 import com.geosun.rmpd.application.dto.DeclarationDto;
 import com.geosun.rmpd.application.service.CmrService;
 import com.geosun.rmpd.application.service.DeclarationService;
+import com.geosun.rmpd.application.service.PartySuggestionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.io.IOException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,10 +32,15 @@ public class CmrController {
 
     private final CmrService cmrService;
     private final DeclarationService declarationService;
+    private final PartySuggestionService partySuggestionService;
 
-    public CmrController(CmrService cmrService, DeclarationService declarationService) {
+    public CmrController(
+            CmrService cmrService,
+            DeclarationService declarationService,
+            PartySuggestionService partySuggestionService) {
         this.cmrService = cmrService;
         this.declarationService = declarationService;
+        this.partySuggestionService = partySuggestionService;
     }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -55,6 +63,20 @@ public class CmrController {
         return ResponseEntity.ok(cmrService.getLatest(declarationId));
     }
 
+    @GetMapping("/preview")
+    @Operation(summary = "Перегляд завантаженого скану CMR")
+    public ResponseEntity<byte[]> preview(@PathVariable Long declarationId) throws IOException {
+        CmrDocumentDto meta = cmrService.getLatest(declarationId);
+        byte[] content = cmrService.readPreview(declarationId);
+        MediaType mediaType = meta.mimeType() != null
+                ? MediaType.parseMediaType(meta.mimeType())
+                : MediaType.APPLICATION_OCTET_STREAM;
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + meta.originalFilename() + "\"")
+                .contentType(mediaType)
+                .body(content);
+    }
+
     @PostMapping("/apply")
     @PreAuthorize("hasAnyRole('ADMIN','DISPATCHER')")
     @Operation(summary = "Застосувати вибрані поля до декларації")
@@ -63,5 +85,11 @@ public class CmrController {
             @Valid @RequestBody CmrApplyRequestDto request) {
         cmrService.applyFields(declarationId, request);
         return ResponseEntity.ok(declarationService.get(declarationId));
+    }
+
+    @GetMapping("/party-suggestions")
+    @Operation(summary = "Підказки контрагентів з розпізнаного CMR")
+    public ResponseEntity<CmrPartySuggestionsDto> partySuggestions(@PathVariable Long declarationId) {
+        return ResponseEntity.ok(partySuggestionService.fromCmr(declarationId));
     }
 }

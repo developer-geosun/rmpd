@@ -1,5 +1,6 @@
 package com.geosun.rmpd.api.controller;
 
+import com.geosun.rmpd.api.audit.Audited;
 import com.geosun.rmpd.application.dto.DeclarationDto;
 import com.geosun.rmpd.application.dto.DeclarationEventDto;
 import com.geosun.rmpd.application.dto.DeclarationProgressDto;
@@ -53,6 +54,7 @@ public class DeclarationController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','DISPATCHER')")
+    @Audited(action = "DECLARATION_CREATE", resourceType = "declaration")
     @Operation(summary = "Створити черновик")
     public ResponseEntity<DeclarationDto> create() {
         return ResponseEntity.ok(declarationService.create());
@@ -96,6 +98,7 @@ public class DeclarationController {
 
     @PostMapping("/{id}/submit")
     @PreAuthorize("hasAnyRole('ADMIN','DISPATCHER')")
+    @Audited(action = "DECLARATION_SUBMIT", resourceType = "declaration")
     @Operation(summary = "Підписати та відправити в PUESC")
     public ResponseEntity<SubmitResultDto> submit(@PathVariable Long id) {
         return ResponseEntity.ok(submitService.submit(id));

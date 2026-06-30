@@ -54,5 +54,15 @@ public class MockPuescSoapClient implements PuescSoapClient {
         return new PuescIncomingDocument(sysRef, "RMPD_RESPONSE", ref, false, xml);
     }
 
+    @Override
+    public PuescIncomingDocument getNextDocumentSisc(
+            String username, String password, String targetSystem, SiscContext context) {
+        if (context != null && context.hasAny()) {
+            log.info("Mock GetNextDocumentSisc ROP={} ROF={} P={}",
+                    context.idSiscRop(), context.idSiscRof(), context.idSiscP());
+        }
+        return getNextDocument(username, password, targetSystem);
+    }
+
     private record PendingResponse(String referenceNumber) {}
 }

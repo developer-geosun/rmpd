@@ -10,6 +10,7 @@ import com.geosun.rmpd.infrastructure.persistence.DeclarationEventRepository;
 import com.geosun.rmpd.infrastructure.persistence.DeclarationRepository;
 import com.geosun.rmpd.infrastructure.puesc.PuescIncomingDocument;
 import com.geosun.rmpd.infrastructure.puesc.PuescSoapClient;
+import com.geosun.rmpd.infrastructure.puesc.SiscContext;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -58,8 +59,13 @@ public class PuescPollingService {
         try {
             PuescCredential credential = credentialService.requireActiveCredential();
             String password = credentialService.decryptPassword(credential);
-            PuescIncomingDocument incoming = puescSoapClient.getNextDocument(
-                    credential.getUsername(), password, targetSystem);
+            SiscContext context = SiscContext.of(
+                    credential.getIdSiscRop(), credential.getIdSiscRof(), credential.getIdSiscP());
+            PuescIncomingDocument incoming = context.hasAny()
+                    ? puescSoapClient.getNextDocumentSisc(
+                            credential.getUsername(), password, targetSystem, context)
+                    : puescSoapClient.getNextDocument(
+                            credential.getUsername(), password, targetSystem);
             if (incoming == null) {
                 return;
             }

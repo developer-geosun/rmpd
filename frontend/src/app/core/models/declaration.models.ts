@@ -85,6 +85,9 @@ export interface PuescCredential {
   username: string;
   passwordConfigured: boolean;
   signingCertPath?: string;
+  idSiscRop?: string;
+  idSiscRof?: string;
+  idSiscP?: string;
   active: boolean;
   lastTestAt?: string;
   lastTestOk?: boolean;
@@ -95,6 +98,9 @@ export interface PuescCredentialUpsert {
   username: string;
   password?: string;
   signingCertPath?: string;
+  idSiscRop?: string;
+  idSiscRof?: string;
+  idSiscP?: string;
 }
 
 export interface PuescConnectionTest {
@@ -116,10 +122,60 @@ export interface CmrDocument {
   fileSizeBytes: number;
   extractedFields: CmrExtractedField[];
   appliedAt?: string;
+  previewUrl?: string;
 }
 
 export interface DictionaryEntry {
   code: string;
   labelPl: string;
   labelEn: string;
+}
+
+export interface AmendmentRequest {
+  vehicleId?: number;
+  routeStartDate?: string;
+  routeEndDate?: string;
+  comment?: string;
+  amendmentReason?: string;
+}
+
+export interface GpsCheckResult {
+  valid: boolean;
+  gpsDeviceId?: string;
+  latitude?: number;
+  longitude?: number;
+  recordedAt?: string;
+  source?: string;
+  positionStale: boolean;
+  message: string;
+}
+
+export interface CmrBatchItemResult {
+  declarationId: number | null;
+  filename: string;
+  success: boolean;
+  error?: string;
+  extractedFieldCount: number;
+}
+
+export interface CmrBatchResult {
+  total: number;
+  succeeded: number;
+  items: CmrBatchItemResult[];
+}
+
+export interface PartySuggestion {
+  partyId: number;
+  partyRole: string;
+  name: string;
+  idNumber: string;
+  matchScore: number;
+  source: string;
+}
+
+export interface CmrPartySuggestions {
+  extractedSenderName?: string;
+  extractedReceiverName?: string;
+  senderMatch?: PartySuggestion;
+  receiverMatch?: PartySuggestion;
 }

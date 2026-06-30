@@ -10,4 +10,6 @@ public interface PartyRepository extends JpaRepository<Party, Long> {
     List<Party> findByCarrierIdOrderByNameAsc(Long carrierId);
 
     Optional<Party> findByIdAndCarrierId(Long id, Long carrierId);
+
+    List<Party> findByCarrierIdAndNameContainingIgnoreCaseOrderByNameAsc(Long carrierId, String name);
 }

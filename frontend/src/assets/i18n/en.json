@@ -1,0 +1,102 @@
+{
+  "nav": {
+    "home": "Home",
+    "declarations": "Declarations",
+    "puesc": "PUESC",
+    "dictionaries": "Dictionaries"
+  },
+  "app": {
+    "title": "RMPD100 System",
+    "logout": "Log out"
+  },
+  "lang": {
+    "uk": "Українська",
+    "pl": "Polski",
+    "en": "English"
+  },
+  "declarations": {
+    "title": "RMPD100 declarations",
+    "new": "New declaration",
+    "open": "Open",
+    "copy": "Copy",
+    "filterStatus": "Status",
+    "all": "All",
+    "back": "Back",
+    "status": "Status",
+    "progress": "Completion",
+    "reference": "SENT reference",
+    "updated": "Updated",
+    "saved": "Saved",
+    "saveError": "Save failed",
+    "validateOk": "Validation passed",
+    "validate": "Validate",
+    "xml": "XML",
+    "xmlPreview": "XML preview",
+    "downloadXml": "Download XML",
+    "submit": "Submit to PUESC",
+    "submitting": "Submitting to PUESC…",
+    "submitted": "Submitted to PUESC",
+    "submitError": "Submit failed",
+    "copyOk": "Copy created",
+    "copyError": "Copy failed",
+    "notFound": "Declaration not found",
+    "loadError": "Load failed",
+    "createError": "Could not create",
+    "missing": "Remaining",
+    "events": "Event history",
+    "saveNow": "Save now"
+  },
+  "amend": {
+    "title": "RMPD amendment",
+    "hint": "Update a registered declaration (RMPD form)",
+    "reason": "Reason for change",
+    "apply": "Save changes",
+    "downloadXml": "Amendment XML",
+    "submit": "Submit amendment",
+    "submitted": "Amendment submitted",
+    "saved": "Changes saved"
+  },
+  "wizard": {
+    "carrier": "Carrier",
+    "vehicle": "Vehicle",
+    "permit": "Permit",
+    "route": "Route",
+    "parties": "Parties",
+    "confirm": "Confirmation",
+    "next": "Next",
+    "prev": "Back"
+  },
+  "cmr": {
+    "title": "CMR — autofill",
+    "dropHint": "Drag PDF, PNG, JPEG or TXT (max 10 MB)",
+    "recognized": "CMR recognized",
+    "uploadError": "CMR upload failed",
+    "apply": "Apply selected",
+    "applied": "Fields applied",
+    "scan": "CMR scan",
+    "batch": "Batch CMR",
+    "batchDone": "Uploaded {{ok}} of {{total}}",
+    "batchError": "Batch upload failed"
+  },
+  "gps": {
+    "title": "GPS check (RMPD406)",
+    "hint": "SENT-GEO locator activity check",
+    "check": "Check position",
+    "position": "Position",
+    "status": "Result",
+    "downloadXml": "RMPD406 XML",
+    "submit": "Submit RMPD406",
+    "submitted": "RMPD406 submitted",
+    "submitError": "RMPD406 submit failed"
+  },
+  "parties": {
+    "cmrHint": "From CMR",
+    "applyHint": "Apply",
+    "hintApplied": "Party applied"
+  },
+  "common": {
+    "close": "Close",
+    "ok": "OK",
+    "error": "Error"
+  }
+}

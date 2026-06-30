@@ -4,27 +4,34 @@
     <mat-nav-list>
       <a mat-list-item routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
         <mat-icon matListItemIcon>home</mat-icon>
-        <span matListItemTitle>Головна</span>
+        <span matListItemTitle>{{ 'nav.home' | translate }}</span>
       </a>
       <a mat-list-item routerLink="/declarations" routerLinkActive="active">
         <mat-icon matListItemIcon>description</mat-icon>
-        <span matListItemTitle>Декларації</span>
+        <span matListItemTitle>{{ 'nav.declarations' | translate }}</span>
       </a>
       <a mat-list-item routerLink="/settings/puesc" routerLinkActive="active">
         <mat-icon matListItemIcon>cloud</mat-icon>
-        <span matListItemTitle>PUESC</span>
+        <span matListItemTitle>{{ 'nav.puesc' | translate }}</span>
       </a>
       <a mat-list-item routerLink="/dictionaries" routerLinkActive="active">
         <mat-icon matListItemIcon>menu_book</mat-icon>
-        <span matListItemTitle>Довідники</span>
+        <span matListItemTitle>{{ 'nav.dictionaries' | translate }}</span>
       </a>
     </mat-nav-list>
   </mat-sidenav>
 
   <mat-sidenav-content>
     <mat-toolbar color="primary">
-      <span>Система RMPD100</span>
+      <span>{{ 'app.title' | translate }}</span>
       <span class="spacer"></span>
+      <mat-form-field class="lang-select" subscriptSizing="dynamic">
+        <mat-select [value]="locale.current()" (selectionChange)="onLangChange($event.value)">
+          @for (l of locale.languages; track l.code) {
+            <mat-option [value]="l.code">{{ l.labelKey | translate }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
       @if (user(); as u) {
         <span class="user">{{ u.email }} ({{ u.role }})</span>
       }
@@ -33,7 +40,7 @@
           API: {{ health.status }}
         </span>
       }
-      <button mat-icon-button type="button" (click)="logout()" aria-label="Вийти">
+      <button mat-icon-button type="button" (click)="logout()" [attr.aria-label]="'app.logout' | translate">
         <mat-icon>logout</mat-icon>
       </button>
     </mat-toolbar>

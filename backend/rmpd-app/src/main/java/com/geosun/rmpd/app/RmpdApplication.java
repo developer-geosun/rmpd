@@ -4,10 +4,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication(scanBasePackages = "com.geosun.rmpd")
 @EntityScan("com.geosun.rmpd.domain.model")
 @EnableJpaRepositories("com.geosun.rmpd.infrastructure.persistence")
+@EnableScheduling
 public class RmpdApplication {
 
     public static void main(String[] args) {

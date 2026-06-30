@@ -20,9 +20,14 @@ import com.geosun.rmpd.domain.model.Party;
 import com.geosun.rmpd.domain.model.Permit;
 import com.geosun.rmpd.domain.model.User;
 import com.geosun.rmpd.domain.model.Vehicle;
+import com.geosun.rmpd.infrastructure.persistence.AuditLogRepository;
 import com.geosun.rmpd.infrastructure.persistence.CarrierRepository;
+import com.geosun.rmpd.infrastructure.persistence.CmrDocumentRepository;
+import com.geosun.rmpd.infrastructure.persistence.DeclarationEventRepository;
+import com.geosun.rmpd.infrastructure.persistence.DeclarationRepository;
 import com.geosun.rmpd.infrastructure.persistence.PartyRepository;
 import com.geosun.rmpd.infrastructure.persistence.PermitRepository;
+import com.geosun.rmpd.infrastructure.persistence.PuescCredentialRepository;
 import com.geosun.rmpd.infrastructure.persistence.UserRepository;
 import com.geosun.rmpd.infrastructure.persistence.VehicleRepository;
 import java.time.LocalDate;
@@ -64,6 +69,21 @@ class DeclarationFlowIntegrationTest {
     private PartyRepository partyRepository;
 
     @Autowired
+    private CmrDocumentRepository cmrDocumentRepository;
+
+    @Autowired
+    private DeclarationEventRepository declarationEventRepository;
+
+    @Autowired
+    private DeclarationRepository declarationRepository;
+
+    @Autowired
+    private PuescCredentialRepository puescCredentialRepository;
+
+    @Autowired
+    private AuditLogRepository auditLogRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     private String accessToken;
@@ -74,6 +94,11 @@ class DeclarationFlowIntegrationTest {
 
     @BeforeEach
     void seed() throws Exception {
+        cmrDocumentRepository.deleteAll();
+        declarationEventRepository.deleteAll();
+        declarationRepository.deleteAll();
+        auditLogRepository.deleteAll();
+        puescCredentialRepository.deleteAll();
         vehicleRepository.deleteAll();
         permitRepository.deleteAll();
         partyRepository.deleteAll();
@@ -137,7 +162,7 @@ class DeclarationFlowIntegrationTest {
         accessToken = login();
 
         PuescCredentialUpsertDto cred = new PuescCredentialUpsertDto(
-                PuescEnvironment.TEST, "admin@test.local", "puesc-test-pass", null);
+                PuescEnvironment.TEST, "admin@test.local", "puesc-test-pass", null, null, null, null);
         mockMvc.perform(put("/api/v1/settings/puesc")
                         .header("Authorization", "Bearer " + accessToken)
                         .contentType(MediaType.APPLICATION_JSON)

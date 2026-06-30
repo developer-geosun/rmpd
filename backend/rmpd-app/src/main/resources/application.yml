@@ -26,14 +26,29 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,prometheus,metrics
   endpoint:
     health:
       show-details: when_authorized
+  metrics:
+    tags:
+      application: rmpd
 
 rmpd:
+  dictionary-sync:
+    enabled: ${RMPD_DICTIONARY_SYNC_ENABLED:true}
+    cron: ${RMPD_DICTIONARY_SYNC_CRON:0 0 3 * * *}
   version: 0.1.0-SNAPSHOT
   xsd-path: ${RMPD_XSD_PATH:../specs/rmpd/RMPD_v20.11.2024}
+  rate-limit:
+    per-minute: ${RMPD_RATE_LIMIT_PER_MINUTE:10}
+  signing:
+    cert-password: ${RMPD_SIGNING_CERT_PASSWORD:}
+  ocr:
+    provider: ${OCR_PROVIDER:mock}
+    azure:
+      endpoint: ${AZURE_DI_ENDPOINT:}
+      api-key: ${AZURE_DI_API_KEY:}
   jwt:
     secret: ${RMPD_JWT_SECRET:change-me-in-production-use-256-bit-secret-key!!}
     access-token-ttl-minutes: 15
@@ -43,6 +58,11 @@ rmpd:
   mail:
     enabled: ${RMPD_MAIL_ENABLED:false}
     from: ${RMPD_MAIL_FROM:noreply@rmpd.local}
+    locale: ${RMPD_MAIL_LOCALE:uk}
+  gps:
+    provider: ${GPS_PROVIDER:mock}
+    stale-threshold-hours: ${GPS_STALE_THRESHOLD_HOURS:24}
+    etoll-api-url: ${ETOLL_API_URL:}
 
 puesc:
   env: ${PUESC_ENV:test}
@@ -50,6 +70,9 @@ puesc:
   wsdl-url: ${PUESC_WSDL_URL:https://te-ws.puesc.gov.pl/seap_wsChannel/DocumentHandlingPort?wsdl}
   soap-endpoint: ${PUESC_SOAP_ENDPOINT:https://te-ws.puesc.gov.pl/seap_wsChannel/DocumentHandlingPort}
   target-system: ${PUESC_TARGET_SYSTEM:SENT}
+  retry:
+    max-attempts: ${PUESC_RETRY_MAX_ATTEMPTS:3}
+    initial-backoff-ms: ${PUESC_RETRY_INITIAL_BACKOFF_MS:1000}
   polling:
     enabled: ${PUESC_POLLING_ENABLED:true}
     interval-ms: ${PUESC_POLLING_INTERVAL_MS:30000}

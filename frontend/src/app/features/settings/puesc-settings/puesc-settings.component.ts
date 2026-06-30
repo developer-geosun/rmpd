@@ -32,6 +32,9 @@ export class PuescSettingsComponent implements OnInit {
     username: ['', [Validators.required, Validators.email]],
     password: [''],
     signingCertPath: [''],
+    idSiscRop: [''],
+    idSiscRof: [''],
+    idSiscP: [''],
   });
 
   ngOnInit(): void {
@@ -41,6 +44,9 @@ export class PuescSettingsComponent implements OnInit {
         this.form.patchValue({
           username: s.username,
           signingCertPath: s.signingCertPath ?? '',
+          idSiscRop: s.idSiscRop ?? '',
+          idSiscRof: s.idSiscRof ?? '',
+          idSiscP: s.idSiscP ?? '',
         });
       },
     });
@@ -56,6 +62,9 @@ export class PuescSettingsComponent implements OnInit {
         username: raw.username!,
         password: raw.password || undefined,
         signingCertPath: raw.signingCertPath || undefined,
+        idSiscRop: raw.idSiscRop || undefined,
+        idSiscRof: raw.idSiscRof || undefined,
+        idSiscP: raw.idSiscP || undefined,
         environment: 'TEST',
       })
       .subscribe({

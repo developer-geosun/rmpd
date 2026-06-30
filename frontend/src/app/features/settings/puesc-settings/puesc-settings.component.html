@@ -27,6 +27,24 @@
         <input matInput formControlName="signingCertPath" />
       </mat-form-field>
 
+      <h3>Агентська модель (idSisc)</h3>
+      <p class="hint">Для GetNextDocumentSisc та мультиперевізника в PUESC</p>
+
+      <mat-form-field class="full">
+        <mat-label>idSiscROP (агентство)</mat-label>
+        <input matInput formControlName="idSiscRop" />
+      </mat-form-field>
+
+      <mat-form-field class="full">
+        <mat-label>idSiscROF</mat-label>
+        <input matInput formControlName="idSiscRof" />
+      </mat-form-field>
+
+      <mat-form-field class="full">
+        <mat-label>idSiscP</mat-label>
+        <input matInput formControlName="idSiscP" />
+      </mat-form-field>
+
       <div class="actions">
         <button mat-flat-button color="primary" type="button" (click)="save()">Зберегти</button>
         <button mat-stroked-button type="button" (click)="test()">Тест з'єднання</button>
@@ -47,6 +65,7 @@
 <style>
   .form { display: flex; flex-direction: column; gap: 0.5rem; max-width: 480px; }
   .full { width: 100%; }
+  .hint { font-size: 0.85rem; color: #666; margin: 0 0 0.5rem; }
   .actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
   .ok { color: #2e7d32; }
   .err { color: #c62828; }

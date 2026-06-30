@@ -29,6 +29,101 @@
   <p class="missing-hint">Залишилось: {{ missingFields().join(', ') }}</p>
 }
 
+@if (validationErrors().length > 0) {
+  <mat-card class="validation-card">
+    <mat-card-content>
+      <h3>{{ 'declarations.validate' | translate }}</h3>
+      <ul>
+        @for (err of validationErrors(); track err) {
+          <li>{{ err }}</li>
+        }
+      </ul>
+    </mat-card-content>
+  </mat-card>
+}
+
+@if (showXmlPreview() && xmlPreview(); as xml) {
+  <mat-card class="xml-preview-card">
+    <mat-card-content>
+      <h3>{{ 'declarations.xmlPreview' | translate }}</h3>
+      <textarea readonly rows="12" class="xml-textarea">{{ xml }}</textarea>
+    </mat-card-content>
+  </mat-card>
+}
+
+@if (isRegistered()) {
+  <mat-card class="gps-card">
+    <mat-card-header>
+      <mat-card-title>{{ 'gps.title' | translate }}</mat-card-title>
+      <mat-card-subtitle>{{ 'gps.hint' | translate }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      @if (gpsResult(); as gps) {
+        <dl class="summary-dl">
+          <dt>GPS ID</dt><dd>{{ gps.gpsDeviceId || '—' }}</dd>
+          <dt>{{ 'gps.position' | translate }}</dt>
+          <dd>
+            @if (gps.latitude != null) {
+              {{ gps.latitude }}, {{ gps.longitude }} ({{ gps.source }})
+            } @else {
+              —
+            }
+          </dd>
+          <dt>{{ 'gps.status' | translate }}</dt>
+          <dd [class.ok]="gps.valid" [class.warn]="!gps.valid">{{ gps.message }}</dd>
+        </dl>
+      }
+      <div class="actions">
+        <button mat-stroked-button type="button" (click)="runGpsCheck()">{{ 'gps.check' | translate }}</button>
+        <button mat-stroked-button type="button" (click)="downloadGpsXml()">{{ 'gps.downloadXml' | translate }}</button>
+        <button mat-flat-button color="primary" type="button" (click)="submitGpsCheck()">{{ 'gps.submit' | translate }}</button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+}
+
+@if (isRegistered()) {
+  <mat-card class="amend-card">
+    <mat-card-header>
+      <mat-card-title>{{ 'amend.title' | translate }}</mat-card-title>
+      <mat-card-subtitle>{{ 'amend.hint' | translate }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="amendForm" class="form-grid">
+        <mat-form-field class="full">
+          <mat-label>{{ 'wizard.vehicle' | translate }}</mat-label>
+          <mat-select formControlName="vehicleId">
+            @for (v of vehicles; track v.id) {
+              <mat-option [value]="v.id">{{ vehicleLabel(v) }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{ 'declarations.updated' | translate }} (start)</mat-label>
+          <input matInput type="date" formControlName="routeStartDate" />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{ 'declarations.updated' | translate }} (end)</mat-label>
+          <input matInput type="date" formControlName="routeEndDate" />
+        </mat-form-field>
+        <mat-form-field class="full">
+          <mat-label>{{ 'amend.reason' | translate }}</mat-label>
+          <textarea matInput rows="2" formControlName="amendmentReason"></textarea>
+        </mat-form-field>
+        <mat-form-field class="full">
+          <mat-label>Коментар</mat-label>
+          <textarea matInput rows="2" formControlName="comment"></textarea>
+        </mat-form-field>
+      </form>
+      <div class="actions">
+        <button mat-stroked-button type="button" (click)="saveAmendment()">{{ 'amend.apply' | translate }}</button>
+        <button mat-stroked-button type="button" (click)="downloadAmendXml()">{{ 'amend.downloadXml' | translate }}</button>
+        <button mat-flat-button color="primary" type="button" (click)="submitAmendment()">{{ 'amend.submit' | translate }}</button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+}
+
 <mat-card class="wizard-card">
   <mat-card-content>
     <form [formGroup]="form">
@@ -187,6 +282,13 @@
                   }
                 </mat-select>
               </mat-form-field>
+              @if (cmrPartyHints()?.senderMatch; as hint) {
+                <p class="party-hint">
+                  {{ 'parties.cmrHint' | translate }}: {{ cmrPartyHints()?.extractedSenderName }}
+                  → {{ hint.name }} ({{ (hint.matchScore * 100) | number: '1.0-0' }}%)
+                  <button mat-button type="button" (click)="applyPartyHint('sender')">{{ 'parties.applyHint' | translate }}</button>
+                </p>
+              }
 
               <mat-form-field>
                 <mat-label>Отримувач (Odbiorca)</mat-label>
@@ -196,6 +298,13 @@
                   }
                 </mat-select>
               </mat-form-field>
+              @if (cmrPartyHints()?.receiverMatch; as hint) {
+                <p class="party-hint">
+                  {{ 'parties.cmrHint' | translate }}: {{ cmrPartyHints()?.extractedReceiverName }}
+                  → {{ hint.name }} ({{ (hint.matchScore * 100) | number: '1.0-0' }}%)
+                  <button mat-button type="button" (click)="applyPartyHint('receiver')">{{ 'parties.applyHint' | translate }}</button>
+                </p>
+              }
             } @else {
               <p class="full">Для типу {{ form.controls.transportType.value }} відправник і отримувач не потрібні.</p>
             }
@@ -235,10 +344,28 @@
             </mat-checkbox>
 
             <div class="cmr-section">
-              <h3>CMR — автозаповнення</h3>
-              <div class="cmr-drop">
-                <input type="file" accept=".pdf,.png,.jpg,.jpeg,.txt" (change)="onCmrSelected($event)" />
-                <p>PDF, PNG, JPEG або TXT (до 10 МБ)</p>
+              <h3>{{ 'cmr.title' | translate }}</h3>
+              <div class="cmr-layout">
+                <div
+                  class="cmr-drop"
+                  [class.drag-over]="cmrDragOver()"
+                  (dragover)="onCmrDragOver($event)"
+                  (dragleave)="onCmrDragLeave()"
+                  (drop)="onCmrDrop($event)"
+                >
+                  <input type="file" accept=".pdf,.png,.jpg,.jpeg,.txt" (change)="onCmrSelected($event)" />
+                  <p>{{ 'cmr.dropHint' | translate }}</p>
+                </div>
+                @if (cmrPreviewUrl(); as preview) {
+                  <div class="cmr-preview">
+                    <h4>{{ 'cmr.scan' | translate }}</h4>
+                    @if (cmr()?.mimeType?.startsWith('image/')) {
+                      <img [src]="preview" [alt]="cmr()?.originalFilename" />
+                    } @else {
+                      <iframe [src]="preview" title="CMR preview"></iframe>
+                    }
+                  </div>
+                }
               </div>
               @if (cmr(); as doc) {
                 <p>Файл: {{ doc.originalFilename }}</p>
@@ -257,20 +384,21 @@
                     </mat-list-item>
                   }
                 </mat-list>
-                <button mat-stroked-button type="button" (click)="applyCmr()">Застосувати вибрані</button>
+                <button mat-stroked-button type="button" (click)="applyCmr()">{{ 'cmr.apply' | translate }}</button>
               }
             </div>
 
             <div class="actions">
-              <button mat-stroked-button type="button" (click)="save()">Зберегти зараз</button>
-              <button mat-stroked-button type="button" (click)="validate()">Перевірити</button>
-              <button mat-stroked-button type="button" (click)="downloadXml()">XML</button>
+              <button mat-stroked-button type="button" (click)="save()">{{ 'declarations.saveNow' | translate }}</button>
+              <button mat-stroked-button type="button" (click)="validate()">{{ 'declarations.validate' | translate }}</button>
+              <button mat-stroked-button type="button" (click)="toggleXmlPreview()">{{ 'declarations.xmlPreview' | translate }}</button>
+              <button mat-stroked-button type="button" (click)="downloadXml()">{{ 'declarations.downloadXml' | translate }}</button>
               <button mat-flat-button color="primary" type="button" [disabled]="submitting()" (click)="submit()">
-                Відправити в PUESC
+                {{ 'declarations.submit' | translate }}
               </button>
             </div>
 
-            <h3>Історія подій</h3>
+            <h3>{{ 'declarations.events' | translate }}</h3>
             <mat-list>
               @for (e of events(); track e.id) {
                 <mat-list-item>

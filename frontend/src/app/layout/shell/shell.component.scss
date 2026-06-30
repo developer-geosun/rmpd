@@ -25,6 +25,16 @@
   font-size: 0.875rem;
 }
 
+.lang-select {
+  width: 9rem;
+  margin-right: 1rem;
+  font-size: 0.875rem;
+
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+}
+
 .health-badge {
   font-size: 0.875rem;
   opacity: 0.85;

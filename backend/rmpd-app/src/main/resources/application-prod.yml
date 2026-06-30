@@ -1,0 +1,19 @@
+# Production profile — активується: SPRING_PROFILES_ACTIVE=prod
+spring:
+  jpa:
+    show-sql: false
+
+puesc:
+  env: prod
+  client: ${PUESC_CLIENT:http}
+  wsdl-url: ${PUESC_WSDL_URL:https://ws.puesc.gov.pl/seap_wsChannel/DocumentHandlingPort?wsdl}
+  soap-endpoint: ${PUESC_SOAP_ENDPOINT:https://ws.puesc.gov.pl/seap_wsChannel/DocumentHandlingPort}
+
+management:
+  endpoint:
+    health:
+      show-details: never
+
+rmpd:
+  mail:
+    enabled: ${RMPD_MAIL_ENABLED:true}

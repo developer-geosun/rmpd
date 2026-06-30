@@ -87,6 +87,15 @@ public class CmrService {
     }
 
     @Transactional(readOnly = true)
+    public byte[] readPreview(Long declarationId) throws IOException {
+        CmrDocument doc = cmrDocumentRepository.findByDeclarationIdOrderByCreatedAtDesc(declarationId).stream()
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("CMR не знайдено"));
+        requireDeclaration(declarationId);
+        return fileStorageService.read(doc.getFilePath());
+    }
+
+    @Transactional(readOnly = true)
     public CmrDocumentDto getLatest(Long declarationId) {
         requireDeclaration(declarationId);
         return cmrDocumentRepository.findByDeclarationIdOrderByCreatedAtDesc(declarationId).stream()
@@ -146,7 +155,8 @@ public class CmrService {
                 doc.getMimeType(),
                 doc.getFileSizeBytes(),
                 fields,
-                doc.getAppliedAt() != null ? doc.getAppliedAt().toString() : null);
+                doc.getAppliedAt() != null ? doc.getAppliedAt().toString() : null,
+                "/api/v1/declarations/" + doc.getDeclaration().getId() + "/cmr/preview");
     }
 
     private String toJson(Object value) {

@@ -1,17 +1,35 @@
 <div class="page-header">
-  <h1>Декларації RMPD100</h1>
+  <h1>{{ 'declarations.title' | translate }}</h1>
   <div class="header-actions">
     <mat-form-field class="filter-field">
-      <mat-label>Статус</mat-label>
+      <mat-label>{{ 'declarations.filterStatus' | translate }}</mat-label>
       <mat-select [value]="statusFilter()" (selectionChange)="onFilterChange($event.value)">
         @for (opt of statusOptions; track opt.value) {
-          <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+          <mat-option [value]="opt.value">
+            @if (opt.value === '') {
+              {{ opt.labelKey | translate }}
+            } @else {
+              {{ opt.labelKey }}
+            }
+          </mat-option>
         }
       </mat-select>
     </mat-form-field>
     <button mat-flat-button color="primary" type="button" (click)="create()">
       <mat-icon>add</mat-icon>
-      Нова декларація
+      {{ 'declarations.new' | translate }}
+    </button>
+    <input
+      #batchInput
+      type="file"
+      accept=".pdf,.png,.jpg,.jpeg,.txt"
+      multiple
+      hidden
+      (change)="onBatchSelected($event)"
+    />
+    <button mat-stroked-button type="button" [disabled]="batchUploading()" (click)="batchInput.click()">
+      <mat-icon>upload_file</mat-icon>
+      {{ 'cmr.batch' | translate }}
     </button>
   </div>
 </div>
@@ -23,12 +41,12 @@
   </ng-container>
 
   <ng-container matColumnDef="status">
-    <th mat-header-cell *matHeaderCellDef>Статус</th>
+    <th mat-header-cell *matHeaderCellDef>{{ 'declarations.status' | translate }}</th>
     <td mat-cell *matCellDef="let row">{{ row.status }}</td>
   </ng-container>
 
   <ng-container matColumnDef="progress">
-    <th mat-header-cell *matHeaderCellDef>Заповнення</th>
+    <th mat-header-cell *matHeaderCellDef>{{ 'declarations.progress' | translate }}</th>
     <td mat-cell *matCellDef="let row">
       <div class="progress-cell">
         <mat-progress-bar mode="determinate" [value]="row.completionPercent ?? 0" />
@@ -43,19 +61,20 @@
   </ng-container>
 
   <ng-container matColumnDef="referenceNumber">
-    <th mat-header-cell *matHeaderCellDef>Референс SENT</th>
+    <th mat-header-cell *matHeaderCellDef>{{ 'declarations.reference' | translate }}</th>
     <td mat-cell *matCellDef="let row">{{ row.referenceNumber || '—' }}</td>
   </ng-container>
 
   <ng-container matColumnDef="updatedAt">
-    <th mat-header-cell *matHeaderCellDef>Оновлено</th>
+    <th mat-header-cell *matHeaderCellDef>{{ 'declarations.updated' | translate }}</th>
     <td mat-cell *matCellDef="let row">{{ row.updatedAt | date: 'short' }}</td>
   </ng-container>
 
   <ng-container matColumnDef="actions">
     <th mat-header-cell *matHeaderCellDef></th>
     <td mat-cell *matCellDef="let row">
-      <a mat-button [routerLink]="['/declarations', row.id]">Відкрити</a>
+      <a mat-button [routerLink]="['/declarations', row.id]">{{ 'declarations.open' | translate }}</a>
+      <button mat-button type="button" (click)="copy(row.id, $event)">{{ 'declarations.copy' | translate }}</button>
     </td>
   </ng-container>
 

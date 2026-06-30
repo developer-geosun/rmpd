@@ -10,5 +10,9 @@ public enum DeclarationEventType {
     REGISTERED,
     REJECTED,
     ERROR,
-    CMR_APPLIED
+    CMR_APPLIED,
+    AMENDMENT_APPLIED,
+    AMENDMENT_SUBMITTED,
+    GPS_CHECK,
+    GPS_CHECK_SUBMITTED
 }

@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { PartySuggestion } from '../models/declaration.models';
 import {
   CarrierProfile,
   Party,
@@ -69,5 +70,13 @@ export class ReferenceDataApiService {
 
   deleteParty(id: number): Observable<void> {
     return this.http.delete<void>(`/api/v1/parties/${id}`);
+  }
+
+  searchPartySuggestions(q: string, role?: string): Observable<PartySuggestion[]> {
+    let params = new HttpParams().set('q', q);
+    if (role) {
+      params = params.set('role', role);
+    }
+    return this.http.get<PartySuggestion[]>('/api/v1/parties/suggestions', { params });
   }
 }

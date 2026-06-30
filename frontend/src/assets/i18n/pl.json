@@ -1,0 +1,102 @@
+{
+  "nav": {
+    "home": "Strona główna",
+    "declarations": "Deklaracje",
+    "puesc": "PUESC",
+    "dictionaries": "Słowniki"
+  },
+  "app": {
+    "title": "System RMPD100",
+    "logout": "Wyloguj"
+  },
+  "lang": {
+    "uk": "Українська",
+    "pl": "Polski",
+    "en": "English"
+  },
+  "declarations": {
+    "title": "Deklaracje RMPD100",
+    "new": "Nowa deklaracja",
+    "open": "Otwórz",
+    "copy": "Kopiuj",
+    "filterStatus": "Status",
+    "all": "Wszystkie",
+    "back": "Wstecz",
+    "status": "Status",
+    "progress": "Wypełnienie",
+    "reference": "Referencja SENT",
+    "updated": "Zaktualizowano",
+    "saved": "Zapisano",
+    "saveError": "Błąd zapisu",
+    "validateOk": "Walidacja OK",
+    "validate": "Sprawdź",
+    "xml": "XML",
+    "xmlPreview": "Podgląd XML",
+    "downloadXml": "Pobierz XML",
+    "submit": "Wyślij do PUESC",
+    "submitting": "Wysyłanie do PUESC…",
+    "submitted": "Wysłano do PUESC",
+    "submitError": "Błąd wysyłki",
+    "copyOk": "Kopia utworzona",
+    "copyError": "Błąd kopiowania",
+    "notFound": "Nie znaleziono deklaracji",
+    "loadError": "Błąd ładowania",
+    "createError": "Nie udało się utworzyć",
+    "missing": "Pozostało",
+    "events": "Historia zdarzeń",
+    "saveNow": "Zapisz teraz"
+  },
+  "amend": {
+    "title": "Aktualizacja RMPD",
+    "hint": "Zmiana danych zarejestrowanej deklaracji (formularz RMPD)",
+    "reason": "Powód zmiany",
+    "apply": "Zapisz zmiany",
+    "downloadXml": "XML aktualizacji",
+    "submit": "Wyślij aktualizację",
+    "submitted": "Aktualizacja wysłana",
+    "saved": "Zmiany zapisane"
+  },
+  "wizard": {
+    "carrier": "Przewoźnik",
+    "vehicle": "Pojazd",
+    "permit": "Zezwolenie",
+    "route": "Trasa",
+    "parties": "Kontrahenci",
+    "confirm": "Potwierdzenie",
+    "next": "Dalej",
+    "prev": "Wstecz"
+  },
+  "cmr": {
+    "title": "CMR — autouzupełnianie",
+    "dropHint": "Przeciągnij PDF, PNG, JPEG lub TXT (max 10 MB)",
+    "recognized": "CMR rozpoznany",
+    "uploadError": "Błąd przesyłania CMR",
+    "apply": "Zastosuj wybrane",
+    "applied": "Pola zastosowane",
+    "scan": "Skan CMR",
+    "batch": "Paczka CMR",
+    "batchDone": "Wgrano {{ok}} z {{total}}",
+    "batchError": "Błąd wgrywania paczki"
+  },
+  "gps": {
+    "title": "Kontrola GPS (RMPD406)",
+    "hint": "Weryfikacja lokalizatora SENT-GEO",
+    "check": "Sprawdź pozycję",
+    "position": "Pozycja",
+    "status": "Wynik",
+    "downloadXml": "XML RMPD406",
+    "submit": "Wyślij RMPD406",
+    "submitted": "RMPD406 wysłany",
+    "submitError": "Błąd wysyłki RMPD406"
+  },
+  "parties": {
+    "cmrHint": "Z CMR",
+    "applyHint": "Wstaw",
+    "hintApplied": "Kontrahent wstawiony"
+  },
+  "common": {
+    "close": "Zamknij",
+    "ok": "OK",
+    "error": "Błąd"
+  }
+}

@@ -8,6 +8,9 @@ public record PuescCredentialDto(
         String username,
         boolean passwordConfigured,
         String signingCertPath,
+        String idSiscRop,
+        String idSiscRof,
+        String idSiscP,
         boolean active,
         Instant lastTestAt,
         Boolean lastTestOk) {}

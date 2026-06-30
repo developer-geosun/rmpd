@@ -90,19 +90,41 @@ public class HttpPuescSoapClient implements PuescSoapClient {
                     WsSecurityPasswordDigest.create(password),
                     SeapSoapEnvelopeBuilder.newMessageId(),
                     targetSystem);
-            HttpResponse<String> response = post(envelope);
-            String body = response.body();
-            if (body == null || body.isBlank() || body.contains("No documents")) {
-                return null;
-            }
-            String sysRef = extract(body, SYS_REF_PATTERN);
-            String ref = extract(body, Pattern.compile("<referenceNumber>([^<]+)</referenceNumber>"));
-            boolean rejected = body.contains("REJECTED") || body.contains("NPP");
-            return new PuescIncomingDocument(sysRef, "RMPD_RESPONSE", ref, rejected, body);
+            return parseIncoming(post(envelope).body());
         } catch (Exception ex) {
             log.warn("GetNextDocument failed: {}", ex.getMessage());
             return null;
         }
+    }
+
+    @Override
+    public PuescIncomingDocument getNextDocumentSisc(
+            String username, String password, String targetSystem, SiscContext context) {
+        if (context == null || !context.hasAny()) {
+            return getNextDocument(username, password, targetSystem);
+        }
+        try {
+            String envelope = SeapSoapEnvelopeBuilder.buildGetNextDocumentSisc(
+                    username,
+                    WsSecurityPasswordDigest.create(password),
+                    SeapSoapEnvelopeBuilder.newMessageId(),
+                    targetSystem,
+                    context);
+            return parseIncoming(post(envelope).body());
+        } catch (Exception ex) {
+            log.warn("GetNextDocumentSisc failed: {}", ex.getMessage());
+            return null;
+        }
+    }
+
+    private PuescIncomingDocument parseIncoming(String body) {
+        if (body == null || body.isBlank() || body.contains("No documents")) {
+            return null;
+        }
+        String sysRef = extract(body, SYS_REF_PATTERN);
+        String ref = extract(body, Pattern.compile("<referenceNumber>([^<]+)</referenceNumber>"));
+        boolean rejected = body.contains("REJECTED") || body.contains("NPP");
+        return new PuescIncomingDocument(sysRef, "RMPD_RESPONSE", ref, rejected, body);
     }
 
     private HttpResponse<String> post(String envelope) throws IOException, InterruptedException {

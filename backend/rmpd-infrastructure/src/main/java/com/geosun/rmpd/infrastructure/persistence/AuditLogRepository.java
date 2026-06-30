@@ -1,0 +1,10 @@
+package com.geosun.rmpd.infrastructure.persistence;
+
+import com.geosun.rmpd.domain.model.AuditLog;
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
+
+    List<AuditLog> findByCarrierIdOrderByCreatedAtDesc(Long carrierId);
+}

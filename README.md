@@ -81,14 +81,22 @@ rmpd/
 
 **Фаза 0:** scaffold монорепозитория, Docker Compose, CI, OpenAPI skeleton.
 
-**Фаза 1 / Спринт 1:** JWT auth, multi-tenant CRUD справочников, профиль перевозчика.
+**Фаза 1:** JWT auth, справочники, мастер RMPD100, XML/XSD, i18n (PL/UK/EN), автосохранение, копирование деклараций.
 
-**Фаза 2:** PUESC SOAP (mock/http), submit + polling, CMR OCR, email-уведомления.
+**Фаза 2:** PUESC SOAP (mock/http) + retry, XAdES-BES подпись (PKCS12), submit + polling, CMR OCR (mock/Azure), email PL/UK, rate limiting.
+
+**Фаза 3:** prod PUESC (`application-prod.yml`), синхронізація словників, актуалізація RMPD, аудит, Prometheus, backup MySQL, runbook.
+
+**Фаза 4:** RMPD406 GPS-перевірка, пакетне завантаження CMR, підказки контрагентів з CMR, агентська модель (idSiscROP/ROF/P), порт GPS-провайдерів (mock/e-TOLL stub).
 
 Demo-вхід (після старту backend): `admin@demo.local` / `admin123`
 
-> PUESC по умолчанию в режиме `mock` (`PUESC_CLIENT=mock`). Для test.puesc: `PUESC_CLIENT=http` + credentials в **PUESC** / **Налаштування PUESC**.
+> Prod: `SPRING_PROFILES_ACTIVE=prod`, `PUESC_ENV=prod`, `PUESC_CLIENT=http`.
 
-> При обновлении сбросьте volume MySQL (`docker compose down -v`) при смене схемы Flyway.
+> Моніторинг: `/actuator/health`, `/actuator/prometheus`.
 
-Следующий шаг — полный мастер RMPD100 (спринты 2–4 фазы 1).
+> Backup: `deploy/scripts/backup-mysql.sh` (retention 30 днів).
+
+> Runbook: [docs/runbook-emergency.md](docs/runbook-emergency.md) · UAT: [docs/uat-checklist.md](docs/uat-checklist.md)
+
+> GPS: `GPS_PROVIDER=mock` (default), `GPS_STALE_THRESHOLD_HOURS=24`. Agency: idSiscROP/ROF/P у налаштуваннях PUESC.
